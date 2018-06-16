@@ -10,7 +10,13 @@ const calculateRacePercentage = ({position, numberOfRunners}) => {
     if (parseInt(position, 10) === 1) {
         return 'Winner!';
     } else {
-        return `Top ${calculatePercentage({first: position, second: numberOfRunners})}%` ;
+        let percent = calculatePercentage({first: position, second: numberOfRunners});
+
+        if (percent === 0) { 
+            percent = 1;
+        }
+
+        return `Top ${percent}%` ;
     }
 };
 
@@ -30,13 +36,24 @@ const calculateCategoryResult = ({race, runner, runnerName}) => {
             if (positionResult === 1) {
                 percentage = `Fastest ${runnersInCategory[i].category}`;
             } else {
-                percentage = `Top ${calculatePercentage({first: positionResult, second: countInCategory})}%`;
+                let percent = calculatePercentage({first: positionResult, second: countInCategory});
+
+                if (percent === 0) { 
+                    percent = 1;
+                }
+
+                percentage = `Top ${percent}%`;
             }
             break;
         }
     }
 
-    return {position, percentage};
+    const winner = {
+        name: upperCaseWords(runnersInCategory[0].name.toLowerCase()),
+        time: prettyMs(getNumberOfMillisecondsTaken(runnersInCategory[0].time)),
+    };
+
+    return {position, percentage, winner};
 };
 
 const calculateClubResult = ({race, runner, runnerName}) => {
@@ -45,23 +62,26 @@ const calculateClubResult = ({race, runner, runnerName}) => {
     );
     const countInClub = runnersInClub.length;
     let position;
-    let percentage;
+    let percentage = '';
 
     for(let i = 0; i < countInClub; i++) {
         if (runnersInClub[i].name.toLowerCase() === runnerName.toLowerCase()) {
             const positionResult = i + 1;
             position = `${positionResult} of ${countInClub}`;
             
-            if (positionResult === 1) {
-                percentage = `Fastest ${runnersInClub[i].club} runner`;
-            } else {
+            if (positionResult > 1) {
                 percentage = `Top ${calculatePercentage({first: positionResult, second: countInClub})}%`;
-            }
+            } 
             break;
         }
     }
 
-    return {position, percentage};
+    const winner = {
+        name: upperCaseWords(runnersInClub[0].name.toLowerCase()),
+        time: prettyMs(getNumberOfMillisecondsTaken(runnersInClub[0].time)),
+    };
+
+    return {position, percentage, winner};
 };
 
 const getNumberOfMillisecondsTaken = (raceDuration) => {
@@ -87,22 +107,11 @@ const getNumberOfMillisecondsTaken = (raceDuration) => {
 
 const calculateTimeDifference = ({runnersInRace, runnerTime}) => {
     const firstRunnerTime = runnersInRace[0].time;
-    let lastRunnerTime;
-
-    for (let i = runnersInRace.length - 1; i > 0; i--) {
-        if (runnersInRace[i].time.indexOf(':') > -1) {
-            lastRunnerTime = runnersInRace[i].time;
-            break;
-        }
-    }
-
     const runnerToCheckNumberOfSeconds = getNumberOfMillisecondsTaken(runnerTime);
     const firstPlaceNumberOfSeconds = getNumberOfMillisecondsTaken(firstRunnerTime);
-    const lastPlaceNumberOfSeconds = getNumberOfMillisecondsTaken(lastRunnerTime);
-    const differenceFromFirst = prettyMs(runnerToCheckNumberOfSeconds - firstPlaceNumberOfSeconds);
-    const differenceFromLast = prettyMs(lastPlaceNumberOfSeconds - firstPlaceNumberOfSeconds);
+    const timeFromFirst = prettyMs(runnerToCheckNumberOfSeconds - firstPlaceNumberOfSeconds);
 
-    return {differenceFromFirst, differenceFromLast};
+    return (timeFromFirst === '0ms') ? "" : timeFromFirst;
 };
 
 const search = (runnerName) => {
@@ -121,7 +130,7 @@ const search = (runnerName) => {
         if (runners.length > 0) {
             const categoryResult = calculateCategoryResult({race, runner: runners[0], runnerName});
             const clubResult = calculateClubResult({race, runner: runners[0], runnerName});
-            const timeDifference = calculateTimeDifference({runnersInRace: race.runners, runnerTime: runners[0].time});
+            const timeDifferenceFromFirst = calculateTimeDifference({runnersInRace: race.runners, runnerTime: runners[0].time});
 
             filteredRaces.races.push({
                 id: race.id,
@@ -135,12 +144,17 @@ const search = (runnerName) => {
                     category: runners[0].category,
                     categoryPosition: categoryResult.position,
                     categoryPercentage: categoryResult.percentage,
+                    categoryWinner: categoryResult.winner,
                     club: runners[0].club,
                     clubPosition: clubResult.position,
                     clubPercentage: clubResult.percentage,
+                    clubWinner: clubResult.winner,
                     time: prettyMs(getNumberOfMillisecondsTaken(runners[0].time)),
-                    timeFromFirst: timeDifference.differenceFromFirst,
-                    timeFromLast: timeDifference.differenceFromLast,
+                    winner: {
+                        name: upperCaseWords(race.runners[0].name.toLowerCase()),
+                        time: prettyMs(getNumberOfMillisecondsTaken(race.runners[0].time)),
+                    },
+                    timeFromFirst: timeDifferenceFromFirst,
                 }
             });
         }

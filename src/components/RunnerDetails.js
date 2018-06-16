@@ -4,13 +4,14 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
+import { ArrowDownward } from '@material-ui/icons';
 
 const cardStyles = { 
     marginRight: '10px',
     marginLeft: '5px',
     marginTop: '5px',
     marginBottom: '5px',
-    height: '170px',
+    height: '190px',
 };
 
 const styles = {
@@ -25,7 +26,7 @@ const styles = {
         paddingTop: '10px',
         paddingBottom: '20px',
     },
-    raceCard: {
+    overallCard: {
         ...cardStyles,
         '&:hover' : {
             boxShadow: '0px 0px 9px #50AE55'
@@ -57,15 +58,18 @@ const styles = {
 
 function RunnerDetails(props) {
     const { classes, runner } = props;
+    const timeDownwardArrow = (runner.timeFromFirst !== "") 
+        ? <ArrowDownward /> 
+        : null;
 
     return (
         <div key={runner.time} className={classes.root}>
             <Grid className={classes.root} container>
                 <Grid item xs>
-                    <Card className={classes.raceCard}>
+                    <Card className={classes.overallCard}>
                         <CardContent>
                             <Typography variant="body2" className={classes.cardTitle}>
-                                Race
+                                Overall
                             </Typography>
                             <div className={classes.cardBody}>
                                 <Typography variant="subheading">
@@ -73,9 +77,6 @@ function RunnerDetails(props) {
                                 </Typography>
                                 <Typography variant="subheading">
                                     {runner.racePercentagePosition}
-                                </Typography>
-                                <Typography variant="subheading">
-                                    {runner.time}
                                 </Typography>
                             </div>
                         </CardContent>
@@ -96,6 +97,9 @@ function RunnerDetails(props) {
                                 </Typography>
                                 <Typography variant="subheading">
                                     {runner.categoryPosition}
+                                </Typography>
+                                <Typography variant="subheading">
+                                    {runner.categoryWinner.name} - {runner.categoryWinner.time}
                                 </Typography>
                             </div>
                         </CardContent>
@@ -119,6 +123,9 @@ function RunnerDetails(props) {
                                 <Typography variant="subheading">
                                     {runner.clubPosition}
                                 </Typography>
+                                <Typography variant="subheading">
+                                    {runner.clubWinner.name} - {runner.clubWinner.time}
+                                </Typography>
                             </div>
                         </CardContent>
                     </Card>
@@ -131,10 +138,13 @@ function RunnerDetails(props) {
                             </Typography>
                             <div className={classes.cardBody}>
                                 <Typography variant="subheading">
-                                    {runner.timeFromFirst}
+                                    {runner.time}
                                 </Typography>
                                 <Typography variant="subheading">
-                                    {runner.timeFromLast}
+                                    {runner.winner.name} - {runner.winner.time}
+                                </Typography>
+                                <Typography variant="subheading">
+                                    {timeDownwardArrow} {runner.timeFromFirst}
                                 </Typography>
                             </div>
                         </CardContent>

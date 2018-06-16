@@ -131,6 +131,11 @@ class Search extends Component {
               placeholder='Find a runner...'
               defaultValue='Tom Brunt'
               required={true}
+              onKeyPress={event => {
+                if (event.key === 'Enter') {
+                  this.handleClick(event)
+                }
+              }}
             />
             <Button variant="contained" color="primary" className={classes.button} onClick={this.handleClick}>
               search
