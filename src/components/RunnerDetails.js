@@ -5,20 +5,45 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 
+const cardStyles = { 
+    marginRight: '10px',
+    marginLeft: '5px',
+    marginTop: '5px',
+    marginBottom: '5px',
+    height: '190px',
+};
+
 const styles = {
     root: {
         flexGrow: 1,
         marginRight: '10px',
-        marginLeft: '10px',
+        marginLeft: '5px',
         marginTop: '5px',
         marginBottom: '5px',
     },
-    card: {
-      marginRight: '10px',
-      marginLeft: '10px',
-      marginTop: '5px',
-      marginBottom: '5px',
-      height: '180px',
+    raceCard: {
+        ...cardStyles,
+        '&:hover' : {
+            boxShadow: '0px 0px 9px #4b54fc'
+        }
+    },
+    categoryCard: {
+        ...cardStyles,
+        '&:hover' : {
+            boxShadow: '0px 0px 9px #363fdb'
+        }
+    },
+    clubCard: {
+        ...cardStyles,
+        '&:hover' : {
+            boxShadow: '0px 0px 9px #232bc4'
+        }
+    },
+    timeCard: {
+        ...cardStyles,
+        '&:hover' : {
+            boxShadow: '0px 0px 9px #0f169b'
+        }
     },
     cardTitle: {
       textAlign: 'left',
@@ -32,7 +57,7 @@ function RunnerDetails(props) {
         <div key={runner.time} className={classes.root}>
             <Grid className={classes.root} container>
                 <Grid item xs>
-                    <Card className={classes.card}>
+                    <Card className={classes.raceCard}>
                         <CardContent>
                             <Typography variant="body2" className={classes.cardTitle}>
                                 Race
@@ -50,7 +75,7 @@ function RunnerDetails(props) {
                     </Card>
                 </Grid>
                 <Grid item xs>
-                    <Card className={classes.card}>
+                    <Card className={classes.categoryCard}>
                         <CardContent>
                             <Typography variant="body2" className={classes.cardTitle}>
                                 Category
@@ -70,7 +95,7 @@ function RunnerDetails(props) {
             </Grid>
             <Grid className={classes.root} container>
                 <Grid item xs>
-                    <Card className={classes.card}>
+                    <Card className={classes.clubCard}>
                         <CardContent>
                             <Typography variant="body2" className={classes.cardTitle}>
                                 Club
@@ -88,7 +113,7 @@ function RunnerDetails(props) {
                     </Card>
                 </Grid>
                 <Grid item xs>
-                    <Card className={classes.card}>
+                    <Card className={classes.timeCard}>
                         <CardContent>
                             <Typography variant="body2" className={classes.cardTitle}>
                                 Time

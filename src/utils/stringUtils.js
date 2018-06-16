@@ -1,4 +1,13 @@
 // @TODO: Test Me
 export function upperCaseWords(sentence) {
-    return sentence.split(' ').map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)} `);
+    const sentenceParts = sentence.split(' ').map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)} `);
+    let sentenceToReturn = '';
+
+    sentenceParts.map((part) => {
+        sentenceToReturn = `${sentenceToReturn}${part}`;
+        
+        return sentenceToReturn;
+    });
+
+    return sentenceToReturn;
 };

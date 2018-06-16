@@ -1,4 +1,4 @@
-import prettyMs from 'pretty-ms';
+import { prettyMs } from './../utils/dateTimeUtils';
 import races from "./../data/fellraces";
 import { upperCaseWords } from "./../utils/stringUtils";
 
@@ -149,8 +149,6 @@ const search = (runnerName) => {
     if (filteredRaces) {
         filteredRaces.runner = upperCaseWords(runnerName.toLowerCase());
     }
-
-    //console.log(filteredRaces);
 
     return filteredRaces;
 };
