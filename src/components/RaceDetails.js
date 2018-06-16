@@ -3,7 +3,7 @@ import Typography from '@material-ui/core/Typography';
 
 const RaceDetails = ({race}) => (
     <div key={race.id}>
-        <Typography variant="headline">
+        <Typography variant="headline" color='primary'>
             {race.name} - {race.date}
         </Typography>
     </div>

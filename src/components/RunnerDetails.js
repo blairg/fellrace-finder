@@ -10,7 +10,7 @@ const cardStyles = {
     marginLeft: '5px',
     marginTop: '5px',
     marginBottom: '5px',
-    height: '190px',
+    height: '170px',
 };
 
 const styles = {
@@ -21,32 +21,37 @@ const styles = {
         marginTop: '5px',
         marginBottom: '5px',
     },
+    cardBody: {
+        paddingTop: '10px',
+        paddingBottom: '20px',
+    },
     raceCard: {
         ...cardStyles,
         '&:hover' : {
-            boxShadow: '0px 0px 9px #4b54fc'
+            boxShadow: '0px 0px 9px #50AE55'
         }
     },
     categoryCard: {
         ...cardStyles,
         '&:hover' : {
-            boxShadow: '0px 0px 9px #363fdb'
+            boxShadow: '0px 0px 9px #50AE55'
         }
     },
     clubCard: {
         ...cardStyles,
         '&:hover' : {
-            boxShadow: '0px 0px 9px #232bc4'
+            boxShadow: '0px 0px 9px #50AE55'
         }
     },
     timeCard: {
         ...cardStyles,
         '&:hover' : {
-            boxShadow: '0px 0px 9px #0f169b'
+            boxShadow: '0px 0px 9px #50AE55'
         }
     },
     cardTitle: {
       textAlign: 'left',
+      fontWeight: 'bold',
     },
 };
 
@@ -62,15 +67,17 @@ function RunnerDetails(props) {
                             <Typography variant="body2" className={classes.cardTitle}>
                                 Race
                             </Typography>
-                            <Typography variant="headline">
-                                {runner.position}
-                            </Typography>
-                            <Typography variant="subheading">
-                                {runner.racePercentagePosition}
-                            </Typography>
-                            <Typography variant="headline">
-                                {runner.time}
-                            </Typography>
+                            <div className={classes.cardBody}>
+                                <Typography variant="subheading">
+                                    {runner.position}
+                                </Typography>
+                                <Typography variant="subheading">
+                                    {runner.racePercentagePosition}
+                                </Typography>
+                                <Typography variant="subheading">
+                                    {runner.time}
+                                </Typography>
+                            </div>
                         </CardContent>
                     </Card>
                 </Grid>
@@ -80,15 +87,17 @@ function RunnerDetails(props) {
                             <Typography variant="body2" className={classes.cardTitle}>
                                 Category
                             </Typography>
-                            <Typography variant="headline">
-                                {runner.category}
-                            </Typography>
-                            <Typography variant="subheading">
-                                {runner.categoryPercentage}
-                            </Typography>
-                            <Typography variant="subheading">
-                                {runner.categoryPosition}
-                            </Typography>
+                            <div className={classes.cardBody}>
+                                <Typography variant="subheading">
+                                    {runner.category}
+                                </Typography>
+                                <Typography variant="subheading">
+                                    {runner.categoryPercentage}
+                                </Typography>
+                                <Typography variant="subheading">
+                                    {runner.categoryPosition}
+                                </Typography>
+                            </div>
                         </CardContent>
                     </Card>
                 </Grid>
@@ -100,15 +109,17 @@ function RunnerDetails(props) {
                             <Typography variant="body2" className={classes.cardTitle}>
                                 Club
                             </Typography>
-                            <Typography variant="headline">
-                                {runner.club}
-                            </Typography>
-                            <Typography variant="subheading">
-                                {runner.clubPercentage}
-                            </Typography>
-                            <Typography variant="subheading">
-                                {runner.clubPosition}
-                            </Typography>
+                            <div className={classes.cardBody}>
+                                <Typography variant="subheading">
+                                    {runner.club}
+                                </Typography>
+                                <Typography variant="subheading">
+                                    {runner.clubPercentage}
+                                </Typography>
+                                <Typography variant="subheading">
+                                    {runner.clubPosition}
+                                </Typography>
+                            </div>
                         </CardContent>
                     </Card>
                 </Grid>
@@ -118,12 +129,14 @@ function RunnerDetails(props) {
                             <Typography variant="body2" className={classes.cardTitle}>
                                 Time
                             </Typography>
-                            <Typography variant="headline">
-                                {runner.timeFromFirst}
-                            </Typography>
-                            <Typography variant="headline">
-                                {runner.timeFromLast}
-                            </Typography>
+                            <div className={classes.cardBody}>
+                                <Typography variant="subheading">
+                                    {runner.timeFromFirst}
+                                </Typography>
+                                <Typography variant="subheading">
+                                    {runner.timeFromLast}
+                                </Typography>
+                            </div>
                         </CardContent>
                     </Card>
                 </Grid>

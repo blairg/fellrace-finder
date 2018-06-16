@@ -8,6 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 import RaceDetails from './RaceDetails';
 import RunnerDetails from './RunnerDetails';
@@ -45,6 +46,7 @@ class Search extends Component {
             runnerName: "",
             runner: null,
             sticky: false,
+            loadingResults: false,
         };
     }
 
@@ -68,10 +70,18 @@ class Search extends Component {
         e.preventDefault();
 
         if (upperCaseWords(this.searchRunner.value) !== this.state.runnerName) {
-          const result = search(this.searchRunner.value);
+          this.setState({runner: null});
+          this.setState({loadingResults: true});
 
-          this.setState({runner: result});
-          this.setState({runnerName: upperCaseWords(this.searchRunner.value)});
+          setTimeout(function() 
+          { 
+            const runnerName = this.searchRunner.value;
+            const result = search(runnerName);
+
+            this.setState({runner: result});
+            this.setState({runnerName: upperCaseWords(runnerName)});
+            this.setState({loadingResults: false});
+          }.bind(this), 1500);
 
           if (this.state.sticky) {
             scroll.scrollToTop();
@@ -83,6 +93,7 @@ class Search extends Component {
       const { classes } = this.props;
       const searchClass = this.state.sticky ? classes.search : "";
       let raceResults;
+      let loadingProgress;
 
       if (this.state.runner != null && this.state.runner.races.length > 0) {
         raceResults = this.state.runner.races.map((race) =>
@@ -100,6 +111,18 @@ class Search extends Component {
         </Paper>;
       }
 
+      if (this.state.loadingResults) {
+        loadingProgress = 
+          <span>
+            <br />
+            <LinearProgress />
+            <br />
+            <LinearProgress color="secondary" variant="query" />
+            <br />
+            <LinearProgress />
+          </span>;
+      }
+
       return (
         <div>
           <div className={searchClass}>
@@ -114,6 +137,7 @@ class Search extends Component {
               <Icon className={classes.icon}>face</Icon>
             </Button>
           </div>
+          {loadingProgress}
           {raceResults}
         </div>
       );
