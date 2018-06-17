@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import Search from './components/Search';
 import runnerImage from './runner.png';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import purple from '@material-ui/core/colors/purple';
-import green from '@material-ui/core/colors/green';
+import { purple, green } from '@material-ui/core/colors';
+// import purple from '@material-ui/core/colors/purple';
+// import green from '@material-ui/core/colors/green';
+// import red from '@material-ui/core/colors/red';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 // Font

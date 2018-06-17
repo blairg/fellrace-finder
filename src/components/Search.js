@@ -2,13 +2,17 @@ import React, { Component } from 'react';
 import { animateScroll as scroll } from 'react-scroll';
 
 // Material-UI
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import Icon from '@material-ui/core/Icon';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
+import { red } from '@material-ui/core/colors';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import ClearAllIcon from '@material-ui/icons/ClearAll';
+import SearchIcon from '@material-ui/icons/Search';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 
 import RaceDetails from './RaceDetails';
 import RunnerDetails from './RunnerDetails';
@@ -17,22 +21,55 @@ import search from './../service/searchService';
 import { upperCaseWords } from "./../utils/stringUtils";
 
 const styles = theme => ({
-  button: {
+  searchField: {
+    marginLeft: '5px',
+    marginRight: theme.spacing.unit,
+    minWidth: '40px'
+  },
+  searchButton: {
     margin: theme.spacing.unit,
   },
-  icon: {
+  clearButton: {
+    marginRight: '4px',
     marginLeft: theme.spacing.unit,
+  },
+  scrollToTopButton: {
+    margin: theme.spacing.unit,
+    position: 'sticky',
+    bottom: '30px',
+    left: '95%',
   },
   search: {
     position: 'sticky',
     top: '0px',
     backgroundColor: 'white',
+    marginLeft: '27%',
+    marginRight: '27%',
+    width: '46%',
+  },
+  search: {
+    position: 'sticky',
+    top: '0px',
+    backgroundColor: 'white',
+    // marginLeft: '27%',
+    // marginRight: '27%',
+    // width: '46%',
   },
   noRaces: { 
     marginRight: '10px',
     marginLeft: '10px',
     marginTop: '5px',
     marginBottom: '5px',
+  },
+});
+
+const clearButtonTheme = createMuiTheme({
+  palette: {
+    primary: {
+      light: red[300],
+      main: red[500],
+      dark: red[700],
+    },
   },
 });
 
@@ -68,32 +105,57 @@ class Search extends Component {
 
     handleClick = (e) => {
         e.preventDefault();
+        const searchValue = this.searchRunnerRef.value.trim();
 
-        if (upperCaseWords(this.searchRunner.value) !== this.state.runnerName) {
-          this.setState({runner: null});
-          this.setState({loadingResults: true});
+        if (searchValue !== '') {
+          if (upperCaseWords(searchValue) !== this.state.runnerName) {
+            this.setState({runner: null});
+            this.setState({loadingResults: true});
 
-          setTimeout(function() 
-          { 
-            const runnerName = this.searchRunner.value;
-            const result = search(runnerName);
+            setTimeout(function() 
+            { 
+              const runnerName = searchValue;
+              const result = search(runnerName);
 
-            this.setState({runner: result});
-            this.setState({runnerName: upperCaseWords(runnerName)});
-            this.setState({loadingResults: false});
-          }.bind(this), 1500);
-
-          if (this.state.sticky) {
-            scroll.scrollToTop();
+              this.setState({runner: result});
+              this.setState({runnerName: upperCaseWords(runnerName)});
+              this.setState({loadingResults: false});
+              scroll.scrollTo(170);
+            }.bind(this), 1500);
           }
+        } else {
+          this.clearClick(e);
         }
     }
 
+    clearClick = (e) => {
+      e.preventDefault();
+
+      scroll.scrollToTop();
+
+      setTimeout(function() 
+      { 
+        this.searchRunnerRef.value = '';
+        this.setState({sticky: false});
+        this.setState({runner: null});
+        this.setState({runnerName: null});
+        this.setState({loadingResults: false});
+      }.bind(this), 1000);
+    }
+
+    scrollToTopClick = (e) => {
+      e.preventDefault();
+
+      scroll.scrollToTop();
+    }
+
     render() {
+      // @TODO: Tidy this up getting very cluttered
       const { classes } = this.props;
       const searchClass = this.state.sticky ? classes.search : "";
       let raceResults;
       let loadingProgress;
+      let scrollToTopButton;
 
       if (this.state.runner != null && this.state.runner.races.length > 0) {
         raceResults = this.state.runner.races.map((race) =>
@@ -123,12 +185,24 @@ class Search extends Component {
           </span>;
       }
 
+      if (this.state.sticky) {
+        scrollToTopButton = 
+          <span className={classes.scrollToTopButton}>
+            <Button variant="fab" color="secondary" onClick={this.scrollToTopClick}>
+              <ArrowUpwardIcon />
+            </Button>
+          </span>;
+      }
+
       return (
         <div>
           <div className={searchClass}>
             <TextField
-              inputRef={(input) => this.searchRunner = input}
-              placeholder='Find a runner...'
+              label="Search Runner"
+              type="search"
+              className={classes.searchField}
+              inputRef={(input) => this.searchRunnerRef = input}
+              placeholder='Runners name...'
               defaultValue='Tom Brunt'
               required={true}
               onKeyPress={event => {
@@ -137,13 +211,18 @@ class Search extends Component {
                 }
               }}
             />
-            <Button variant="contained" color="primary" className={classes.button} onClick={this.handleClick}>
-              search
-              <Icon className={classes.icon}>face</Icon>
+            <Button variant="fab" color="secondary" className={classes.searchButton} onClick={this.handleClick}>
+              <SearchIcon />
             </Button>
+            <MuiThemeProvider theme={clearButtonTheme}>
+              <Button variant="fab" color="primary" className={classes.clearButton} onClick={this.clearClick}>
+                <ClearAllIcon />
+              </Button>
+            </MuiThemeProvider>
           </div>
-          {loadingProgress}
-          {raceResults}
+            {loadingProgress}
+            {raceResults}
+            {scrollToTopButton}
         </div>
       );
     }

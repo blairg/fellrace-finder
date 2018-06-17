@@ -86,17 +86,11 @@ function RunnerDetails(props) {
                     <Card className={classes.categoryCard}>
                         <CardContent>
                             <Typography variant="body2" className={classes.cardTitle}>
-                                Category
+                                Category - {runner.category}
                             </Typography>
                             <div className={classes.cardBody}>
                                 <Typography variant="subheading">
-                                    {runner.category}
-                                </Typography>
-                                <Typography variant="subheading">
-                                    {runner.categoryPercentage}
-                                </Typography>
-                                <Typography variant="subheading">
-                                    {runner.categoryPosition}
+                                    {runner.categoryPercentage} -  {runner.categoryPosition}
                                 </Typography>
                                 <Typography variant="subheading">
                                     {runner.categoryWinner.name} - {runner.categoryWinner.time}
@@ -111,17 +105,11 @@ function RunnerDetails(props) {
                     <Card className={classes.clubCard}>
                         <CardContent>
                             <Typography variant="body2" className={classes.cardTitle}>
-                                Club
+                                Club - {runner.club}
                             </Typography>
                             <div className={classes.cardBody}>
                                 <Typography variant="subheading">
-                                    {runner.club}
-                                </Typography>
-                                <Typography variant="subheading">
-                                    {runner.clubPercentage}
-                                </Typography>
-                                <Typography variant="subheading">
-                                    {runner.clubPosition}
+                                    {runner.clubPosition} - {runner.clubPercentage}
                                 </Typography>
                                 <Typography variant="subheading">
                                     {runner.clubWinner.name} - {runner.clubWinner.time}
