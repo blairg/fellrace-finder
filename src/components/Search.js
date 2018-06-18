@@ -24,28 +24,19 @@ const styles = theme => ({
   searchField: {
     marginLeft: '5px',
     marginRight: theme.spacing.unit,
-    minWidth: '40px'
+    minWidth: '30px'
   },
   searchButton: {
-    margin: theme.spacing.unit,
+    marginRight: '4px',
   },
   clearButton: {
     marginRight: '4px',
-    marginLeft: theme.spacing.unit,
   },
   scrollToTopButton: {
     margin: theme.spacing.unit,
-    position: 'sticky',
-    bottom: '30px',
-    left: '95%',
-  },
-  search: {
-    position: 'sticky',
-    top: '0px',
-    backgroundColor: 'white',
-    marginLeft: '27%',
-    marginRight: '27%',
-    width: '46%',
+    position: 'fixed',
+    bottom: '5px',
+    right: '1%',
   },
   search: {
     position: 'sticky',
@@ -109,19 +100,16 @@ class Search extends Component {
 
         if (searchValue !== '') {
           if (upperCaseWords(searchValue) !== this.state.runnerName) {
-            this.setState({runner: null});
-            this.setState({loadingResults: true});
+            this.setState({runner: null, loadingResults: true});
 
             setTimeout(function() 
             { 
               const runnerName = searchValue;
               const result = search(runnerName);
 
-              this.setState({runner: result});
-              this.setState({runnerName: upperCaseWords(runnerName)});
-              this.setState({loadingResults: false});
+              this.setState({runner: result, runnerName: upperCaseWords(runnerName), loadingResults: false});
               scroll.scrollTo(170);
-            }.bind(this), 1500);
+            }.bind(this), 1200);
           }
         } else {
           this.clearClick(e);
@@ -130,22 +118,13 @@ class Search extends Component {
 
     clearClick = (e) => {
       e.preventDefault();
-
+      this.searchRunnerRef.value = '';
+      this.setState({sticky: false, runner: null, runnerName: null, loadingResults: false});
       scroll.scrollToTop();
-
-      setTimeout(function() 
-      { 
-        this.searchRunnerRef.value = '';
-        this.setState({sticky: false});
-        this.setState({runner: null});
-        this.setState({runnerName: null});
-        this.setState({loadingResults: false});
-      }.bind(this), 1000);
     }
 
     scrollToTopClick = (e) => {
       e.preventDefault();
-
       scroll.scrollToTop();
     }
 
