@@ -1,5 +1,7 @@
+import axios from 'axios';
+
 import { prettyMs } from './../utils/dateTimeUtils';
-import races from "./../data/fellraces";
+//import races from "./../data/fellraces";
 import { upperCaseWords } from "./../utils/stringUtils";
 
 const calculatePercentage = ({first, second}) => {
@@ -114,57 +116,104 @@ const calculateTimeDifference = ({runnersInRace, runnerTime}) => {
     return (timeFromFirst === '0ms') ? "" : timeFromFirst;
 };
 
-const search = (runnerName) => {
-    const filteredRaces = {
-        runner: "",
-        races: []
-    };
+const getRaces = async (runner, callback) => {
+    let races = null;
 
-    if (!runnerName) {
-        return filteredRaces;
-    }
+    await axios.get(`http://localhost:5555/runner/${runner}`)
+    .then(function (response) {
+        //console.log(response);
+        callback(response.data);
+        races = response.data;
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
 
-    races.forEach(race => {
-        const runners = race.runners.filter(runner => runner.name.toLowerCase() === runnerName.toLowerCase());
+    return races;
+}
 
-        if (runners.length > 0) {
-            const categoryResult = calculateCategoryResult({race, runner: runners[0], runnerName});
-            const clubResult = calculateClubResult({race, runner: runners[0], runnerName});
-            const timeDifferenceFromFirst = calculateTimeDifference({runnersInRace: race.runners, runnerTime: runners[0].time});
+// const search = async (runnerName) => {
+//     const filteredRaces = {
+//         runner: "",
+//         races: []
+//     };
 
-            filteredRaces.races.push({
-                id: race.id,
-                name: race.race, 
-                date: race.date, 
-                runner: {
-                    position: `${runners[0].position} of ${race.numberofrunners}`,
-                    racePercentagePosition: calculateRacePercentage(
-                        {position: runners[0].position, numberOfRunners: race.numberofrunners}
-                    ),
-                    category: runners[0].category,
-                    categoryPosition: categoryResult.position,
-                    categoryPercentage: categoryResult.percentage,
-                    categoryWinner: categoryResult.winner,
-                    club: runners[0].club,
-                    clubPosition: clubResult.position,
-                    clubPercentage: clubResult.percentage,
-                    clubWinner: clubResult.winner,
-                    time: prettyMs(getNumberOfMillisecondsTaken(runners[0].time)),
-                    winner: {
-                        name: upperCaseWords(race.runners[0].name.toLowerCase()),
-                        time: prettyMs(getNumberOfMillisecondsTaken(race.runners[0].time)),
-                    },
-                    timeFromFirst: timeDifferenceFromFirst,
-                }
-            });
-        }
-    }); 
+//     if (!runnerName) {
+//         return filteredRaces;
+//     }
 
-    if (filteredRaces) {
-        filteredRaces.runner = upperCaseWords(runnerName.toLowerCase());
-    }
+//     let races = [];
 
-    return filteredRaces;
+//     const callback = async (data) => {
+//         //console.log(data);
+//         races = data;
+//     }
+
+//     await getRaces(runnerName, callback);
+//     console.log('---------------------');
+//     console.log(races);
+
+//     races.forEach(race => {
+//         const runners = race.runners.filter(runner => runner.name.toLowerCase() === runnerName.toLowerCase());
+
+//         if (runners.length > 0) {
+//             const categoryResult = calculateCategoryResult({race, runner: runners[0], runnerName});
+//             const clubResult = calculateClubResult({race, runner: runners[0], runnerName});
+//             const timeDifferenceFromFirst = calculateTimeDifference({runnersInRace: race.runners, runnerTime: runners[0].time});
+
+//             filteredRaces.races.push({
+//                 id: race.id,
+//                 name: race.race, 
+//                 date: race.date, 
+//                 //resultsUrl: `javascript:window.open('http://www.fellrunner.org.uk/results.php?id=${race.id}', '_blank')`,
+//                 resultsUrl: ``,
+//                 runner: {
+//                     position: `${runners[0].position} of ${race.numberofrunners}`,
+//                     racePercentagePosition: calculateRacePercentage(
+//                         {position: runners[0].position, numberOfRunners: race.numberofrunners}
+//                     ),
+//                     category: runners[0].category,
+//                     categoryPosition: categoryResult.position,
+//                     categoryPercentage: categoryResult.percentage,
+//                     categoryWinner: categoryResult.winner,
+//                     club: runners[0].club,
+//                     clubPosition: clubResult.position,
+//                     clubPercentage: clubResult.percentage,
+//                     clubWinner: clubResult.winner,
+//                     time: prettyMs(getNumberOfMillisecondsTaken(runners[0].time)),
+//                     winner: {
+//                         name: upperCaseWords(race.runners[0].name.toLowerCase()),
+//                         time: prettyMs(getNumberOfMillisecondsTaken(race.runners[0].time)),
+//                     },
+//                     timeFromFirst: timeDifferenceFromFirst,
+//                 }
+//             });
+//         }
+//     }); 
+
+//     if (filteredRaces) {
+//         filteredRaces.runner = upperCaseWords(runnerName.toLowerCase());
+//     }
+
+//     return filteredRaces;
+// };
+
+
+const search = async (runnerName) => {
+    let races = null;
+
+    await axios.get(`http://localhost:5555/runner/${runnerName}`)
+    .then(function (response) {
+        //console.log(response);
+        //callback(response.data);
+        races = response.data;
+        return races;
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+
+    return races;
 };
 
 

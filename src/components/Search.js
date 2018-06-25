@@ -18,6 +18,7 @@ import RaceDetails from './RaceDetails';
 import RunnerDetails from './RunnerDetails';
 
 import search from './../service/searchService';
+import { get as getFromStorage, set as setInStorage} from './../service/storageService';
 import { upperCaseWords } from "./../utils/stringUtils";
 
 const styles = theme => ({
@@ -42,6 +43,7 @@ const styles = theme => ({
     position: 'sticky',
     top: '0px',
     backgroundColor: 'white',
+    zIndex: '2 !important',
     // marginLeft: '27%',
     // marginRight: '27%',
     // width: '46%',
@@ -94,7 +96,7 @@ class Search extends Component {
         }
     };
 
-    handleClick = (e) => {
+    handleClick = async (e) => {
         e.preventDefault();
         const searchValue = this.searchRunnerRef.value.trim();
 
@@ -102,14 +104,25 @@ class Search extends Component {
           if (upperCaseWords(searchValue) !== this.state.runnerName) {
             this.setState({runner: null, loadingResults: true});
 
-            setTimeout(function() 
+            setTimeout(async function() 
             { 
               const runnerName = searchValue;
-              const result = search(runnerName);
+
+              //const result = await search(runnerName);
+
+              const stored = getFromStorage(runnerName);
+              let result;
+
+              if (!stored) {
+                result = await search(runnerName);
+                setInStorage(runnerName, JSON.stringify(result));
+              } else {
+                result = JSON.parse(stored);
+              }
 
               this.setState({runner: result, runnerName: upperCaseWords(runnerName), loadingResults: false});
               scroll.scrollTo(170);
-            }.bind(this), 1200);
+            }.bind(this), 0);
           }
         } else {
           this.clearClick(e);
@@ -186,7 +199,7 @@ class Search extends Component {
               required={true}
               onKeyPress={event => {
                 if (event.key === 'Enter') {
-                  this.handleClick(event)
+                  this.handleClick(event);
                 }
               }}
             />
