@@ -10,9 +10,11 @@
     "lodash": "^4.17.10",
     "parse-ms": "^1.0.1",
     "react": "^16.4.0",
+    "react-autosuggest": "^9.3.4",
     "react-dom": "^16.4.0",
     "react-scripts": "1.1.4",
     "react-scroll": "^1.7.9",
+    "react-select": "^1.2.1",
     "typeface-roboto": "^0.0.54"
   },
   "scripts": {

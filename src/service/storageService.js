@@ -1,5 +1,5 @@
 export function set(key, value){
-    if (value != "null") {
+    if (value !== "null") {
         sessionStorage.setItem(key, JSON.stringify(value));
     }
 };

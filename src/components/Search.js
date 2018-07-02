@@ -1,31 +1,33 @@
 import React, { Component } from 'react';
 import { animateScroll as scroll } from 'react-scroll';
+import { Async } from 'react-select';
+import 'react-select/dist/react-select.css';
 
 // Material-UI
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
 import { red } from '@material-ui/core/colors';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import ClearAllIcon from '@material-ui/icons/ClearAll';
-import SearchIcon from '@material-ui/icons/Search';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 
 import RaceDetails from './RaceDetails';
 import RunnerDetails from './RunnerDetails';
 
-import search from './../service/searchService';
+import { search, partialSearch } from './../service/searchService';
 import { get as getFromStorage, set as setInStorage} from './../service/storageService';
 import { upperCaseWords } from "./../utils/stringUtils";
 
 const styles = theme => ({
   searchField: {
-    marginLeft: '5px',
-    marginRight: theme.spacing.unit,
-    minWidth: '30px'
+    paddingBottom: '5px',
+    paddingLeft: '5px',
+    paddingRight: '5px',
+    marginTop: '-20px',
+    zIndex: '2',
   },
   searchButton: {
     marginRight: '4px',
@@ -54,6 +56,12 @@ const styles = theme => ({
     marginTop: '5px',
     marginBottom: '5px',
   },
+  suggestions: {
+    marginTop: '3px',
+    marginLeft: '5px',
+    marginRight: theme.spacing.unit,
+    minWidth: '30px',
+  }
 });
 
 const clearButtonTheme = createMuiTheme({
@@ -73,10 +81,11 @@ class Search extends Component {
         this.searchRunnerRef = React.createRef();
 
         this.state = {
-            runnerName: "",
+            runnerName: '',
             runner: null,
             sticky: false,
             loadingResults: false,
+            value: '',
         };
     }
 
@@ -96,43 +105,43 @@ class Search extends Component {
         }
     };
 
-    handleClick = async (e) => {
-        e.preventDefault();
-        const searchValue = this.searchRunnerRef.value.trim();
+    performSearch = async (runnerName) => {
+      if (runnerName) {
+        this.setState({runner: null, loadingResults: true});
+        const stored = getFromStorage(runnerName);
+        let result;
 
-        if (searchValue !== '') {
-          if (upperCaseWords(searchValue) !== this.state.runnerName) {
-            this.setState({runner: null, loadingResults: true});
-
-            setTimeout(async function() 
-            { 
-              const runnerName = searchValue;
-
-              //const result = await search(runnerName);
-
-              const stored = getFromStorage(runnerName);
-              let result;
-
-              if (!stored) {
-                result = await search(runnerName);
-                setInStorage(runnerName, JSON.stringify(result));
-              } else {
-                result = JSON.parse(stored);
-              }
-
-              this.setState({runner: result, runnerName: upperCaseWords(runnerName), loadingResults: false});
-              scroll.scrollTo(170);
-            }.bind(this), 0);
-          }
+        if (!stored) {
+          result = await search(runnerName);
+          setInStorage(runnerName, JSON.stringify(result));
         } else {
-          this.clearClick(e);
+          result = JSON.parse(stored);
         }
+
+        this.setState({
+          runner: result, 
+          runnerName: upperCaseWords(runnerName), 
+          loadingResults: false,
+        });
+        scroll.scrollTo(170);
+      }
+    };
+
+    handleClick = async (event) => {
+      event.preventDefault();
+      const searchValue = this.searchRunnerRef.value.trim();
+
+      if (searchValue !== '') {
+        if (upperCaseWords(searchValue) !== this.state.runnerName) {
+          await this.performSearch(searchValue);
+        }
+      } else {
+        this.clearClick();
+      }
     }
 
-    clearClick = (e) => {
-      e.preventDefault();
-      this.searchRunnerRef.value = '';
-      this.setState({sticky: false, runner: null, runnerName: null, loadingResults: false});
+    clearClick = () => {
+      this.setState({sticky: false, runner: null, runnerName: null, loadingResults: false, value: ''});
       scroll.scrollToTop();
     }
 
@@ -140,6 +149,126 @@ class Search extends Component {
       e.preventDefault();
       scroll.scrollToTop();
     }
+
+    // @TODO: Move out of function scope to a service
+    loadingProgress = () => {
+      return <span>
+        <br />
+        <LinearProgress />
+        <br />
+        <LinearProgress color="secondary" variant="query" />
+        <br />
+        <LinearProgress />
+      </span>;
+    }
+
+    noResultsFound = (cssClass) => {
+      return <Paper className={cssClass}>
+              <Typography variant="subheading">
+                No race results found for this runner!
+              </Typography>
+            </Paper>;
+    }
+
+    buildRaceResult = (race) => {
+      return <div key={race.id}>
+              <br />
+              <RaceDetails race={race} />
+              <RunnerDetails runner={race.runner} />
+            </div>
+    }
+
+    handleSearchChange = async (event) => {
+      event.preventDefault();
+      const searchValue = this.searchRunnerRef.value.trim();
+
+      if (searchValue.length > 2) {
+        this.setState({runner: null, loadingResults: true});
+
+        const cacheKey = `suggestion${searchValue}`;
+        const stored = getFromStorage(cacheKey);
+        let result;
+
+        if (!stored) {
+          result = await partialSearch(searchValue);
+          setInStorage(cacheKey, JSON.stringify(result));
+        } else {
+          result = JSON.parse(stored);
+        }
+
+        this.setState({
+          loadingResults: false,
+          suggestions: result,
+        });
+      } 
+      else {
+        this.setState({
+          suggestions: []
+        });
+      }
+    };
+
+    handleSuggestionSelectionChange = async (suggestion) => {
+      if (suggestion) {
+        const runnerName = suggestion.value;
+        this.searchRunnerRef.value = runnerName;
+        this.setState({suggestions: []});
+
+        await this.performSearch(runnerName);
+      }
+    };
+
+    onChange = async (value) => {
+      if (value) {
+        const searchValue = value.display;
+
+        if (searchValue !== '') {
+          this.setState({
+            value: value,
+          });
+
+          if (upperCaseWords(searchValue) !== this.state.runnerName) {
+            await this.performSearch(searchValue);
+          }
+        } else {
+          this.clearClick();
+        }
+      }
+    };
+
+    getRunners = (searchValue) => {
+      if (!searchValue) {
+        return Promise.resolve({ options: [] });
+      }
+
+      // @TODO: Move out logic to separate file
+      if (searchValue.length > 2) {
+        //return fetch(`http://localhost:5555/autocomplete/runner/${searchValue}`)
+        return fetch(`https://fellrace-finder-server.herokuapp.com/runner/autocomplete/${searchValue}`)
+          .then((response) => response.json())
+          .then((json) => {
+            const runnersList = [];
+
+            json.items.map((runner) => {
+              let found = false;
+
+              runnersList.map((runnerAdded) => {
+                if (runner.display === runnerAdded.display) {
+                  found = true;
+                }
+              });
+
+              if (!found) {
+                runnersList.push(runner);
+              }
+            });
+
+            return { options: runnersList };
+          });
+      } else {
+        return Promise.resolve({ options: [] });
+      }
+    };
 
     render() {
       // @TODO: Tidy this up getting very cluttered
@@ -151,30 +280,14 @@ class Search extends Component {
 
       if (this.state.runner != null && this.state.runner.races.length > 0) {
         raceResults = this.state.runner.races.map((race) =>
-          <div key={race.id}>
-            <br />
-            <RaceDetails race={race} />
-            <RunnerDetails runner={race.runner} />
-          </div>
+          this.buildRaceResult(race)
         );
       } else if (this.state.runner != null && this.state.runner.races.length === 0) {
-        raceResults = <Paper className={classes.noRaces}>
-          <Typography variant="subheading">
-            No race results found for this runner!
-          </Typography>
-        </Paper>;
+        raceResults = this.noResultsFound(classes.noRaces);
       }
 
       if (this.state.loadingResults) {
-        loadingProgress = 
-          <span>
-            <br />
-            <LinearProgress />
-            <br />
-            <LinearProgress color="secondary" variant="query" />
-            <br />
-            <LinearProgress />
-          </span>;
+        loadingProgress = this.loadingProgress();
       }
 
       if (this.state.sticky) {
@@ -187,25 +300,21 @@ class Search extends Component {
       }
 
       return (
-        <div>
+        <React.Fragment>
           <div className={searchClass}>
-            <TextField
-              label="Search Runner"
-              type="search"
+            <Async
               className={classes.searchField}
-              inputRef={(input) => this.searchRunnerRef = input}
-              placeholder='Runners name...'
-              defaultValue='Tom Brunt'
-              required={true}
-              onKeyPress={event => {
-                if (event.key === 'Enter') {
-                  this.handleClick(event);
-                }
-              }}
+              valueKey="original" 
+              labelKey="display"
+              matchProp="any"
+              name='runner-search-field'
+              onChange={this.onChange}
+              loadOptions={this.getRunners}
+              placeholder='Search Runner'
+              noResultsText='No runners found'
+              value={this.state.value}
+              multi={false}
             />
-            <Button variant="fab" color="secondary" className={classes.searchButton} onClick={this.handleClick}>
-              <SearchIcon />
-            </Button>
             <MuiThemeProvider theme={clearButtonTheme}>
               <Button variant="fab" color="primary" className={classes.clearButton} onClick={this.clearClick}>
                 <ClearAllIcon />
@@ -215,7 +324,7 @@ class Search extends Component {
             {loadingProgress}
             {raceResults}
             {scrollToTopButton}
-        </div>
+        </React.Fragment>
       );
     }
   }
