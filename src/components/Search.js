@@ -244,7 +244,7 @@ class Search extends Component {
       // @TODO: Move out logic to separate file
       if (searchValue.length > 2) {
         //return fetch(`http://localhost:5555/autocomplete/runner/${searchValue}`)
-        return fetch(`https://fellrace-finder-server.herokuapp.com/runner/autocomplete/${searchValue}`)
+        return fetch(`https://fellrace-finder-server.herokuapp.com/autocomplete/runner/${searchValue}`)
           .then((response) => response.json())
           .then((json) => {
             const runnersList = [];

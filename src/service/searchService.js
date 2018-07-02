@@ -20,7 +20,7 @@ export async function partialSearch(partialName) {
     let runners = null;
 
     // await axios.get(`http://localhost:5555/runner/autocomplete/${partialName.toLowerCase()}`)
-    await axios.get(`https://fellrace-finder-server.herokuapp.com/runner/autocomplete/${partialName.toLowerCase()}`)
+    await axios.get(`https://fellrace-finder-server.herokuapp.com/autocomplete/runner/${partialName.toLowerCase()}`)
     .then(function (response) {
         runners = response.data;
         return runners;
