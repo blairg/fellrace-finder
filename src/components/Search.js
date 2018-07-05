@@ -18,7 +18,11 @@ import RaceDetails from './RaceDetails';
 import RunnerDetails from './RunnerDetails';
 
 import { search, partialSearch } from './../service/searchService';
-import { get as getFromStorage, set as setInStorage} from './../service/storageService';
+import { 
+  get as getFromStorage, 
+  set as setInStorage, 
+  remove as removeFromStorage
+} from './../service/storageService';
 import { upperCaseWords } from "./../utils/stringUtils";
 
 const styles = theme => ({
@@ -116,6 +120,7 @@ class Search extends Component {
           setInStorage(runnerName, JSON.stringify(result));
         } else {
           result = JSON.parse(stored);
+          removeFromStorage(runnerName);
         }
 
         this.setState({
