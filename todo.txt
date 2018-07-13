@@ -1,0 +1,11 @@
+Material UI for design
+Push to Github pages
+Go API to surface the mongo data
+Use prop types 
+Use flow
+Serviceworker cache site for offline
+
+
+
+Mongo work for all Clubs
+db.createView("distinctCollectionClubs", "races", [{ $group: { _id: "$runners.club"}}]);

@@ -1,0 +1,25 @@
+{
+  "short_name": "Fell Race Finder",
+  "name": "Fell Race Finder - Results Collator",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "favicon_192.ico",
+      "sizes": "192x192",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "runner_512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#9A30AE",
+  "background_color": "#50AE55"
+}
