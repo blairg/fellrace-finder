@@ -40,7 +40,10 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={muiTheme}>
         <CssBaseline />
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet"
+        />
         <div style={styles.container}>
           <header>
             <img src={runnerImage} alt="runner" />
