@@ -3,8 +3,7 @@ import axios from 'axios';
 export async function search(runnerName) {
     let races = null;
 
-    //await axios.get(`http://localhost:5555/runner/${runnerName.toLowerCase()}`)
-    await axios.get(`https://fellrace-finder-server.herokuapp.com/runner/${runnerName.toLowerCase()}`)
+    await axios.get(`${process.env.REACT_APP_API_SERVER}/runner/${runnerName.toLowerCase()}`)
     .then(function (response) {
         races = response.data;
         return races;
@@ -19,8 +18,7 @@ export async function search(runnerName) {
 export async function partialSearch(partialName) {
     let runners = null;
 
-    // await axios.get(`http://localhost:5555/runner/autocomplete/${partialName.toLowerCase()}`)
-    await axios.get(`https://fellrace-finder-server.herokuapp.com/autocomplete/runner/${partialName.toLowerCase()}`)
+    await axios.get(`${process.env.REACT_APP_API_SERVER}/autocomplete/runner/${partialName.toLowerCase()}`)
     .then(function (response) {
         runners = response.data;
         return runners;

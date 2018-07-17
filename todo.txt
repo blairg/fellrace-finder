@@ -1,9 +1,10 @@
-Material UI for design
-Push to Github pages
-Go API to surface the mongo data
+Races filter
+Club filter
+Category filter
+Year filter
 Use prop types 
 Use flow
-Serviceworker cache site for offline
+Improve Serviceworker cache site for offline
 
 
 
