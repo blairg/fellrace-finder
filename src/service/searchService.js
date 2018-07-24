@@ -1,5 +1,10 @@
 import axios from 'axios';
 
+import {
+  getSession,
+  setSession,
+} from './../service/storageService';
+
 export async function search(runnerName) {
   let races = null;
 
@@ -18,22 +23,46 @@ export async function search(runnerName) {
   return races;
 }
 
-export async function partialSearch(partialName) {
-  let runners = null;
+export function partialSearch(partialName) {
+  const cacheKey = `runnersList${partialName}`;
+  const runnersInSessionStorage = getSession(cacheKey);
 
-  await axios
-    .get(
-      `${
-        process.env.REACT_APP_API_SERVER
-      }/autocomplete/runner/${partialName.toLowerCase()}`,
-    )
-    .then(function(response) {
-      runners = response.data;
-      return runners;
-    })
-    .catch(function(error) {
-      console.log(error);
+  if (runnersInSessionStorage) {
+    return { options: runnersInSessionStorage };
+  } 
+
+  const url = `${
+    process.env.REACT_APP_API_SERVER
+  }/autocomplete/runner/${partialName.toLowerCase()}`;
+
+  return fetch(url)
+    .then((response) => {
+      return response.json();
+    }).then((json) => {
+      const runnersList = [];
+
+      json.items.map(runner => {
+        let found = false;
+
+        runnersList.map(runnerAdded => {
+          if (runner.display === runnerAdded.display) {
+            found = true;
+
+            return true;
+          }
+
+          return false;
+        });
+
+        if (!found) {
+          runnersList.push(runner);
+        }
+
+        return found;
+      });
+
+      setSession({key: cacheKey, value: runnersList});
+
+      return { options: runnersList };
     });
-
-  return runners;
 }
