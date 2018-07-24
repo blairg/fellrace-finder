@@ -23,9 +23,12 @@ import RunnerDetails from './RunnerDetails';
 
 import { search, partialSearch } from './../service/searchService';
 import {
-  get as getFromStorage,
-  set as setInStorage,
-  remove as removeFromStorage,
+  getSession,
+  setSession,
+  removeSession,
+  getLocal,
+  setLocal,
+  removeLocal,
 } from './../service/storageService';
 import { upperCaseWords } from './../utils/stringUtils';
 
@@ -92,19 +95,27 @@ class Search extends Component {
 
     this.searchRunnerRef = React.createRef();
 
+    const nameSet = getLocal('chosenRunner');
+    let chosenName = '';
+
+    if (nameSet) {
+      chosenName = nameSet;
+    }
+
     this.state = {
       runnerName: '',
       runner: null,
       races: null,
       sticky: false,
       loadingResults: false,
-      value: '',
+      value: chosenName,
       chosenRace: '',
     };
   }
 
   componentDidMount = () => {
     window.addEventListener('scroll', this.onScroll, false);
+    this.performSearch(this.state.value.display);
   };
 
   componentWillUnmount = () => {
@@ -136,26 +147,32 @@ class Search extends Component {
     }
   };
 
+  scrollToTop = () => {
+    scroll.scrollTo(170);
+  }
+
   performSearch = async runnerName => {
     if (runnerName) {
       this.setState({ runner: null, loadingResults: true, chosenRace: '' });
-      const stored = getFromStorage(runnerName);
+      const cacheKey = `getRunner${runnerName}`.replace(' ', '');
+      const formattedName = upperCaseWords(runnerName).trim();
+      const runnerInStorage = getSession(cacheKey);
       let result;
 
-      if (!stored) {
+      if (!runnerInStorage) {
         result = await search(runnerName);
-        setInStorage(runnerName, JSON.stringify(result));
+        setSession({key: cacheKey, value: JSON.stringify(result)});
       } else {
-        result = JSON.parse(stored);
-        removeFromStorage(runnerName);
+        result = JSON.parse(runnerInStorage);
+        removeSession(cacheKey);
       }
 
       this.setState({
         runner: result,
-        runnerName: upperCaseWords(runnerName),
+        runnerName: formattedName,
         loadingResults: false,
       });
-      scroll.scrollTo(170);
+      this.scrollToTop();
     }
   };
 
@@ -181,6 +198,7 @@ class Search extends Component {
       value: '',
       chosenRace: '',
     });
+    removeLocal('chosenRunner');
     scroll.scrollToTop();
   };
 
@@ -223,50 +241,13 @@ class Search extends Component {
     );
   };
 
-  handleSearchChange = async event => {
-    event.preventDefault();
-    const searchValue = this.searchRunnerRef.value.trim();
-
-    if (searchValue.length > 2) {
-      this.setState({ runner: null, loadingResults: true });
-
-      const cacheKey = `suggestion${searchValue}`;
-      const stored = getFromStorage(cacheKey);
-      let result;
-
-      if (!stored) {
-        result = await partialSearch(searchValue);
-        setInStorage(cacheKey, JSON.stringify(result));
-      } else {
-        result = JSON.parse(stored);
-      }
-
-      this.setState({
-        loadingResults: false,
-        suggestions: result,
-      });
-    } else {
-      this.setState({
-        suggestions: [],
-      });
-    }
-  };
-
-  handleSuggestionSelectionChange = async suggestion => {
-    if (suggestion) {
-      const runnerName = suggestion.value;
-      this.searchRunnerRef.value = runnerName;
-      this.setState({ suggestions: [] });
-
-      await this.performSearch(runnerName);
-    }
-  };
-
   onChange = async value => {
     if (value) {
       const searchValue = value.display;
 
       if (searchValue !== '') {
+        setLocal({key: 'chosenRunner', value: value});
+
         this.setState({
           value: value,
         });
@@ -281,43 +262,14 @@ class Search extends Component {
   };
 
   getRunners = searchValue => {
+    console.log('searhcing', searchValue);
+
     if (!searchValue) {
       return Promise.resolve({ options: [] });
     }
 
-    // @TODO: Move out logic to separate file
     if (searchValue.length > 2) {
-      return fetch(
-        `${
-          process.env.REACT_APP_API_SERVER
-        }/autocomplete/runner/${searchValue}`,
-      )
-        .then(response => response.json())
-        .then(json => {
-          const runnersList = [];
-
-          json.items.map(runner => {
-            let found = false;
-
-            runnersList.map(runnerAdded => {
-              if (runner.display === runnerAdded.display) {
-                found = true;
-
-                return true;
-              }
-
-              return false;
-            });
-
-            if (!found) {
-              runnersList.push(runner);
-            }
-
-            return found;
-          });
-
-          return { options: runnersList };
-        });
+      return Promise.resolve(partialSearch(searchValue));
     } else {
       return Promise.resolve({ options: [] });
     }
@@ -332,7 +284,7 @@ class Search extends Component {
       this.setState({ chosenRace: chosenRace });
     }
 
-    scroll.scrollTo(170);
+    this.scrollToTop();
   };
 
   // @TODO: Break me down please...

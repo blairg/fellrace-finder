@@ -1,36 +1,43 @@
-export function set(key, value) {
+export function setSession({key, value}) {
   if (value !== 'null') {
     sessionStorage.setItem(key, JSON.stringify(value));
   }
 }
 
-export function get(key) {
-  const sessionValue = sessionStorage.getItem(key);
+export function getSession(key) {
+  const value = sessionStorage.getItem(key);
 
-  if (sessionValue) {
-    return JSON.parse(sessionValue);
+  if (value) {
+    return JSON.parse(value);
   }
 
-  return sessionValue;
+  return value;
 }
 
-export function remove(key) {
-  sessionStorage.removeItem(key);
+export function removeSession(key) {
+  if (key) {
+    sessionStorage.removeItem(key);
+  }
 }
 
-// // @TODO: Using local storage until I've got updating working.
-// export function set(key, value){
-//     if (value !== "null") {
-//         localStorage.setItem(key, JSON.stringify(value));
-//     }
-// };
+export function setLocal({key, value}){
+    if (value !== "null") {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+};
 
-// export function get(key){
-//     const sessionValue = localStorage.getItem(key);
+export function getLocal(key){
+    const value = localStorage.getItem(key);
 
-//     if (sessionValue) {
-//         return JSON.parse(sessionValue);
-//     }
+    if (value) {
+        return JSON.parse(value);
+    }
 
-//     return sessionValue;
-// };
+    return value;
+};
+
+export function removeLocal(key) {
+  if (key) {
+    localStorage.removeItem(key);
+  }
+}
