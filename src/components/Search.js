@@ -155,7 +155,7 @@ class Search extends Component {
     if (runnerName) {
       this.setState({ runner: null, loadingResults: true, chosenRace: '' });
       const cacheKey = `getRunner${runnerName}`.replace(' ', '');
-      const formattedName = upperCaseWords(runnerName).trim();
+      const formattedName = runnerName;
       const runnerInStorage = getSession(cacheKey);
       let result;
 
@@ -262,7 +262,7 @@ class Search extends Component {
   };
 
   getRunners = searchValue => {
-    console.log('searhcing', searchValue);
+    console.log('searching - ', searchValue);
 
     if (!searchValue) {
       return Promise.resolve({ options: [] });
