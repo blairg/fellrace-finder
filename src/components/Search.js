@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { animateScroll as scroll } from 'react-scroll';
 import { Async } from 'react-select';
+import _ from 'lodash';
 import 'react-select/dist/react-select.css';
 
 // Material-UI
@@ -57,9 +58,6 @@ const styles = theme => ({
     top: '0px',
     backgroundColor: 'white',
     zIndex: '2 !important',
-    // marginLeft: '27%',
-    // marginRight: '27%',
-    // width: '46%',
   },
   noRaces: {
     marginRight: '10px',
@@ -261,19 +259,29 @@ class Search extends Component {
     }
   };
 
-  getRunners = searchValue => {
-    console.log('searching - ', searchValue);
+  fetchRunners = async (searchValue, callback) => {
+      console.log('searching - ', searchValue);
 
-    if (!searchValue) {
-      return Promise.resolve({ options: [] });
-    }
+      if (!searchValue) {
+        callback(null, { options: [] });
+      }
 
-    if (searchValue.length > 2) {
-      return Promise.resolve(partialSearch(searchValue));
-    } else {
-      return Promise.resolve({ options: [] });
-    }
+      if (searchValue.length > 2) {
+        callback(null, await partialSearch(searchValue));
+      } else {
+        callback(null, { options: [] });
+      }
   };
+
+  debouncedFetchRunners = _.debounce(this.fetchRunners, 500);
+
+  getRunners = (searchValue, callback) => {
+    if (!searchValue || searchValue.length < 3) {
+      return callback(null, { options: [] });
+    }
+
+    this.debouncedFetchRunners(searchValue, callback);
+  }
 
   handleChooseRaceChange = event => {
     const chosenRace = event.target.value;
@@ -442,6 +450,8 @@ class Search extends Component {
       <React.Fragment>
         <div className={searchClass}>
           <Async
+            cacheOptions
+            defaultOptions
             className={classes.searchField}
             valueKey="original"
             labelKey="display"
@@ -453,6 +463,7 @@ class Search extends Component {
             noResultsText="No runners found"
             value={this.state.value}
             multi={false}
+            ignoreAccents={false}
           />
           {racesSelect}
           {clearButton}
