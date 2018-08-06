@@ -379,7 +379,7 @@ class Search extends Component {
     let scrollToTopButton;
     let racesSelect;
 
-    if (this.state.runner != null && this.state.runner.races.length > 0) {
+    if (this.state.runner != null && this.state.runner.races && this.state.runner.races.length > 0) {
       // Display clear button
       clearButton = this.buildClearButton();
 
