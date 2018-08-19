@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { animateScroll as scroll } from 'react-scroll';
 import { Async } from 'react-select';
 import _ from 'lodash';
@@ -21,6 +21,7 @@ import Select from '@material-ui/core/Select';
 
 import RaceDetails from './RaceDetails';
 import RunnerDetails from './RunnerDetails';
+import OverallStats from './OverallStats';
 
 import { search, partialSearch } from './../service/searchService';
 import {
@@ -87,7 +88,7 @@ const clearButtonTheme = createMuiTheme({
   },
 });
 
-class Search extends Component {
+class Search extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -273,7 +274,7 @@ class Search extends Component {
       }
   };
 
-  debouncedFetchRunners = _.debounce(this.fetchRunners, 500);
+  debouncedFetchRunners = _.debounce(this.fetchRunners, 350);
 
   getRunners = (searchValue, callback) => {
     if (!searchValue || searchValue.length < 3) {
@@ -377,11 +378,20 @@ class Search extends Component {
     return raceSelector;
   };
 
+  populateOverallStats = () => {
+    if (this.state.runner.overallStats) {
+      return <OverallStats overallStats={this.state.runner.overallStats} />;
+    }
+
+    return null;
+  }
+
   render() {
     // @TODO: Tidy this up getting very cluttered
     const { classes } = this.props;
     const searchClass = this.state.sticky ? classes.search : '';
     let clearButton;
+    let overallStats;
     let raceResults;
     let loadingProgress;
     let scrollToTopButton;
@@ -390,6 +400,7 @@ class Search extends Component {
     if (this.state.runner != null && this.state.runner.races && this.state.runner.races.length > 0) {
       // Display clear button
       clearButton = this.buildClearButton();
+      overallStats = this.populateOverallStats();
 
       const racesForRunner = this.state.runner.races;
 
@@ -469,6 +480,7 @@ class Search extends Component {
           {clearButton}
         </div>
         {loadingProgress}
+        {overallStats}
         {raceResults}
         {scrollToTopButton}
       </React.Fragment>
