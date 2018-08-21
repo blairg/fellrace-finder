@@ -58,8 +58,6 @@ const buildHighestPercentage = (highestPercentage) => {
 function PerformanceStats(props) {
     const { overallStats } = props;
   
-    console.log(overallStats);
-  
     return (
       <React.Fragment>
         <Paper>
