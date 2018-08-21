@@ -11,6 +11,9 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Grid from '@material-ui/core/Grid';
+
+import PerformanceStats from './PerformanceStats';
 
 const HeaderTableCell = withStyles(theme => ({
   root: {
@@ -100,6 +103,8 @@ const buildMonthRows = (racesByYear) => {
 function OverallStats(props) {
   const { overallStats, classes } = props;
 
+  console.log(overallStats);
+
   const yearsAndMonths = buildMonthRows(overallStats.racesByYear);
 
   return (
@@ -109,30 +114,37 @@ function OverallStats(props) {
           <Typography className={classes.heading}>Show number of races by year and month</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-          <Paper className={classes.root}>
-            <Table className={classes.table}>
-              <TableHead>
-                <TableRow key={'header'}>
-                  <HeaderTableCell key={'year'}></HeaderTableCell>
-                  <HeaderTableCell key={'jan'} numeric>Jan</HeaderTableCell>
-                  <HeaderTableCell key={'feb'} numeric>Feb</HeaderTableCell>
-                  <HeaderTableCell key={'mar'} numeric>Mar</HeaderTableCell>
-                  <HeaderTableCell key={'apr'} numeric>Apr</HeaderTableCell>
-                  <HeaderTableCell key={'may'} numeric>May</HeaderTableCell>
-                  <HeaderTableCell key={'jun'} numeric>Jun</HeaderTableCell>
-                  <HeaderTableCell key={'jul'} numeric>Jul</HeaderTableCell>
-                  <HeaderTableCell key={'aug'} numeric>Aug</HeaderTableCell>
-                  <HeaderTableCell key={'sep'} numeric>Sep</HeaderTableCell>
-                  <HeaderTableCell key={'oct'} numeric>Oct</HeaderTableCell>
-                  <HeaderTableCell key={'nov'} numeric>Nov</HeaderTableCell>
-                  <HeaderTableCell key={'dec'} numeric>Dec</HeaderTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {yearsAndMonths}
-              </TableBody>
-            </Table>
-          </Paper>
+          <Grid container>
+            <Grid item xs>
+              <PerformanceStats overallStats={overallStats} />
+            </Grid>
+            <Grid item xs>
+              <Paper className={classes.root}>
+                <Table className={classes.table}>
+                  <TableHead>
+                    <TableRow key={'header'}>
+                      <HeaderTableCell key={'year'}></HeaderTableCell>
+                      <HeaderTableCell key={'jan'} numeric>Jan</HeaderTableCell>
+                      <HeaderTableCell key={'feb'} numeric>Feb</HeaderTableCell>
+                      <HeaderTableCell key={'mar'} numeric>Mar</HeaderTableCell>
+                      <HeaderTableCell key={'apr'} numeric>Apr</HeaderTableCell>
+                      <HeaderTableCell key={'may'} numeric>May</HeaderTableCell>
+                      <HeaderTableCell key={'jun'} numeric>Jun</HeaderTableCell>
+                      <HeaderTableCell key={'jul'} numeric>Jul</HeaderTableCell>
+                      <HeaderTableCell key={'aug'} numeric>Aug</HeaderTableCell>
+                      <HeaderTableCell key={'sep'} numeric>Sep</HeaderTableCell>
+                      <HeaderTableCell key={'oct'} numeric>Oct</HeaderTableCell>
+                      <HeaderTableCell key={'nov'} numeric>Nov</HeaderTableCell>
+                      <HeaderTableCell key={'dec'} numeric>Dec</HeaderTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {yearsAndMonths}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </Grid>
+          </Grid>
         </ExpansionPanelDetails>
       </ExpansionPanel>
     </React.Fragment>
