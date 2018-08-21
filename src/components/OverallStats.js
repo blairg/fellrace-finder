@@ -102,9 +102,6 @@ const buildMonthRows = (racesByYear) => {
 
 function OverallStats(props) {
   const { overallStats, classes } = props;
-
-  console.log(overallStats);
-
   const yearsAndMonths = buildMonthRows(overallStats.racesByYear);
 
   return (
