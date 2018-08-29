@@ -14,6 +14,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Grid from '@material-ui/core/Grid';
 
 import PerformanceStats from './PerformanceStats';
+import PerformanceChart from './PerformanceChart';
 
 const HeaderTableCell = withStyles(theme => ({
   root: {
@@ -35,6 +36,7 @@ const styles = theme => ({
   },
   expansionPanel: {
     marginTop: '5px',
+    marginBottom: '15px',
   }
 });
 
@@ -144,6 +146,7 @@ function OverallStats(props) {
           </Grid>
         </ExpansionPanelDetails>
       </ExpansionPanel>
+      <PerformanceChart performanceGraphData={overallStats.performanceGraphData} />
     </React.Fragment>
   );
 }
