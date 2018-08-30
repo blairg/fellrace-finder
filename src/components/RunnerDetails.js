@@ -73,7 +73,7 @@ function RunnerDetails(props) {
               <div className={classes.cardBody}>
                 <Typography variant="subheading">{runner.position}</Typography>
                 <Typography variant="subheading">
-                  {runner.racePercentagePosition}
+                  {runner.percentagePositionDisplay}
                 </Typography>
               </div>
             </CardContent>
