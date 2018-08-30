@@ -14,7 +14,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Grid from '@material-ui/core/Grid';
 
 import PerformanceStats from './PerformanceStats';
-import PerformanceChart from './PerformanceChart';
+import AveragePerformanceChart from './AveragePerformanceChart';
+import OverallPerformanceChart from './OverallPerformanceChart';
 
 const HeaderTableCell = withStyles(theme => ({
   root: {
@@ -114,10 +115,10 @@ function OverallStats(props) {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container>
-            <Grid item xs>
+            <Grid item xs={12}>
               <PerformanceStats overallStats={overallStats} />
             </Grid>
-            <Grid item xs>
+            <Grid item xs={12}>
               <Paper className={classes.root}>
                 <Table className={classes.table}>
                   <TableHead>
@@ -146,7 +147,26 @@ function OverallStats(props) {
           </Grid>
         </ExpansionPanelDetails>
       </ExpansionPanel>
-      <PerformanceChart performanceGraphData={overallStats.performanceGraphData} />
+      <ExpansionPanel className={classes.expansionPanel}>
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography className={classes.heading}>Show performance graphs</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+          <Grid container>
+              <Grid item xs={12}>
+                <OverallPerformanceChart overallRaceData={overallStats.overallRaceData} />
+              </Grid>
+              <Grid item xs={12}>
+                <AveragePerformanceChart performanceData={overallStats.performanceByMonthData} 
+                                        title={"Average Performance By Month"} xTitle={"Year/Month"} />
+              </Grid>
+              <Grid item xs={12}>                       
+                <AveragePerformanceChart performanceData={overallStats.performanceByYearData} 
+                                        title={"Average Performance By Year"} xTitle={"Year"} />
+              </Grid>
+          </Grid>
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
     </React.Fragment>
   );
 }
