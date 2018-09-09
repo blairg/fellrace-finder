@@ -5,12 +5,13 @@ import {
   setSession,
 } from './../service/storageService';
 
-export async function search(runnerName) {
+export async function search(runnerNames) {
+  const runnersNamedJoined = runnerNames.join('$$');
   let races = null;
 
   await axios
     .get(
-      `${process.env.REACT_APP_API_SERVER}/runner/${runnerName.toLowerCase()}`,
+      `${process.env.REACT_APP_API_SERVER}/runner/${runnersNamedJoined}`,
     )
     .then(function(response) {
       races = response.data;

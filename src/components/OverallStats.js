@@ -79,6 +79,7 @@ const buildMonthRows = (racesByYear) => {
     const listOfTableCells = staticListOfTableCells();
     const yearKey = 'year-' + eachYear.year.toString() + '-' + index.toString();
     const yearCell = <TableCell key={yearKey} numeric>{eachYear.year}</TableCell>;
+    let totalForYear = 0;
 
     if (eachYear.months && eachYear.months.length > 0) {
       for (let i = 0; i < eachYear.months.length; i++) {
@@ -90,12 +91,16 @@ const buildMonthRows = (racesByYear) => {
           const yearMonthKey = 'year-' + eachYear.year.toString() + '-month' + monthName;
           const monthValue = `${eachMonth[monthName]}`;
 
+          totalForYear = totalForYear + parseInt(monthValue, 10);
           listOfTableCells[monthIndex] = <TableCell key={yearMonthKey} numeric>{monthValue}</TableCell>;
         }
       }
     }
 
+    const totalCell = <TableCell key={`total-${yearKey}`} numeric>{totalForYear}</TableCell>;
     const rowKey = eachYear.year.toString() + '-' + index.toString();
+
+    listOfTableCells.unshift(totalCell);
     listOfTableCells.unshift(yearCell);
     listOfYears.push(<TableRow key={rowKey}>{listOfTableCells}</TableRow>);
   });
@@ -124,6 +129,7 @@ function OverallStats(props) {
                   <TableHead>
                     <TableRow key={'header'}>
                       <HeaderTableCell key={'year'}></HeaderTableCell>
+                      <HeaderTableCell key={'total'} numeric>Total</HeaderTableCell>
                       <HeaderTableCell key={'jan'} numeric>Jan</HeaderTableCell>
                       <HeaderTableCell key={'feb'} numeric>Feb</HeaderTableCell>
                       <HeaderTableCell key={'mar'} numeric>Mar</HeaderTableCell>
