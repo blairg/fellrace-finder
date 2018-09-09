@@ -88,17 +88,19 @@ const clearButtonTheme = createMuiTheme({
   },
 });
 
+const chosenRunnersKey = 'chosenRunners';
+
 class Search extends PureComponent {
   constructor(props) {
     super(props);
 
     this.searchRunnerRef = React.createRef();
 
-    const nameSet = getLocal('chosenRunner');
-    let chosenName = '';
+    const namesSet = getLocal(chosenRunnersKey);
+    let chosenRunners = [];
 
-    if (nameSet) {
-      chosenName = nameSet;
+    if (namesSet) {
+      chosenRunners = namesSet;
     }
 
     this.state = {
@@ -107,14 +109,15 @@ class Search extends PureComponent {
       races: null,
       sticky: false,
       loadingResults: false,
-      value: chosenName,
+      value: chosenRunners,
       chosenRace: '',
+      chosenRunners: chosenRunners,
     };
   }
 
   componentDidMount = () => {
     window.addEventListener('scroll', this.onScroll, false);
-    this.performSearch(this.state.value.display);
+    this.onChange(this.state.chosenRunners);
   };
 
   componentWillUnmount = () => {
@@ -175,6 +178,34 @@ class Search extends PureComponent {
     }
   };
 
+  searchForRunners = async runners => {
+    if (runners && runners.length > 0) {
+      let names = [];
+
+      runners.map((eachRunner) => {
+        names.push(eachRunner.display);
+      });
+
+      const cacheKey = `getRunners${names.join('')}`.replace(' ', '');
+      const runnersInStorage = getSession(cacheKey);
+      let result;
+
+      if (!runnersInStorage) {
+        result = await search(names);
+        setSession({key: cacheKey, value: JSON.stringify(result)});
+
+        return result;
+      } else {
+        result = JSON.parse(runnersInStorage);
+        removeSession(cacheKey);
+      }
+
+      return result;
+    }
+
+    return null;
+  };
+
   handleClick = async event => {
     event.preventDefault();
     const searchValue = this.searchRunnerRef.value.trim();
@@ -194,10 +225,11 @@ class Search extends PureComponent {
       runner: null,
       runnerName: null,
       loadingResults: false,
-      value: '',
       chosenRace: '',
+      chosenRunners: [],
     });
-    removeLocal('chosenRunner');
+
+    removeLocal(chosenRunnersKey);
     scroll.scrollToTop();
   };
 
@@ -240,23 +272,26 @@ class Search extends PureComponent {
     );
   };
 
-  onChange = async value => {
-    if (value) {
-      const searchValue = value.display;
+  onChange = async runnerNames => {
+    if (runnerNames.length > 0) {
+      let chosenRunners = [];
 
-      if (searchValue !== '') {
-        setLocal({key: 'chosenRunner', value: value});
+      this.setState({
+        loadingResults: true,
+      });
 
-        this.setState({
-          value: value,
-        });
+      const runnersDetails = await this.searchForRunners(runnerNames);
+  
+      this.setState({
+        runner: runnersDetails,
+        runnerName: runnerNames[0].display,
+        loadingResults: false,
+        chosenRunners: runnerNames,
+      });
 
-        if (upperCaseWords(searchValue) !== this.state.runnerName) {
-          await this.performSearch(searchValue);
-        }
-      } else {
-        this.clearClick();
-      }
+      setLocal({key: chosenRunnersKey, value: runnerNames});
+    } else {
+      this.clearClick();
     }
   };
 
@@ -472,8 +507,8 @@ class Search extends PureComponent {
             loadOptions={this.getRunners}
             placeholder="Search Runner"
             noResultsText="No runners found"
-            value={this.state.value}
-            multi={false}
+            value={this.state.chosenRunners}
+            multi={true}
             ignoreAccents={false}
           />
           {racesSelect}
