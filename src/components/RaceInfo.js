@@ -10,7 +10,22 @@ const cardStyles = {
   marginLeft: '5px',
   marginTop: '5px',
   marginBottom: '5px',
-  height: '190px',
+  height: '150px',
+  ['@media (min-width:400px)']: { // eslint-disable-line no-useless-computed-key
+    height: '230px'
+  },
+  ['@media (min-width:750px)']: { // eslint-disable-line no-useless-computed-key
+    height: '150px'
+  },
+  ['@media (max-width:375px)']: { // eslint-disable-line no-useless-computed-key
+    height: '240px'
+  },
+  ['@media (max-width:350px)']: { // eslint-disable-line no-useless-computed-key
+    height: '310px'
+  },
+  ['@media (max-width:320px)']: { // eslint-disable-line no-useless-computed-key
+    height: '320px'
+  },
 };
 
 const styles = {
