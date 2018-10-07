@@ -12,6 +12,18 @@ const cardStyles = {
   marginTop: '5px',
   marginBottom: '5px',
   height: '190px',
+  ['@media (min-width:750px)']: { // eslint-disable-line no-useless-computed-key
+    height: '140px'
+  },
+  ['@media (max-width:375px)']: { // eslint-disable-line no-useless-computed-key
+    height: '180px'
+  },
+  ['@media (max-width:350px)']: { // eslint-disable-line no-useless-computed-key
+    height: '210px'
+  },
+  ['@media (max-width:320px)']: { // eslint-disable-line no-useless-computed-key
+    height: '220px'
+  },
 };
 
 const styles = {
