@@ -15,6 +15,7 @@ export async function search(runnerNames) {
     )
     .then(function(response) {
       races = response.data;
+      console.log(races);
       return races;
     })
     .catch(function(error) {
