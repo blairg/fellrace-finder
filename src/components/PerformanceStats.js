@@ -55,6 +55,46 @@ const buildHighestPercentage = (highestPercentage) => {
     }
 };
 
+const buildDistance = (kilometersRaced, milesRaced) => {
+    if (kilometersRaced > 0) {
+        return <Typography><b>Distance: </b> {parseFloat(kilometersRaced).toLocaleString()}km - {parseFloat(milesRaced).toLocaleString()}miles</Typography>;
+    } else {
+        return null;
+    }
+};
+
+const buildClimbed = (metersClimbed, feetClimbed) => {
+    if (metersClimbed > 0) {
+        return <Typography><b>Climbed: </b> {parseInt(metersClimbed, 10).toLocaleString()}m - {parseInt(feetClimbed, 10).toLocaleString()}feet</Typography>;
+    } else {
+        return null;
+    }
+};
+
+const buildShortestRace = (shortestRace) => {
+    if (shortestRace && shortestRace.name) {
+        return <Typography><b>Shortest Race: </b> {shortestRace.name} - {shortestRace.kilometers}km - {shortestRace.miles}miles</Typography>;
+    } else {
+        return null;
+    }
+};
+
+const buildLongestRace = (longestRace) => {
+    if (longestRace && longestRace.name) {
+        return <Typography><b>Longest Race: </b> {longestRace.name} - {longestRace.kilometers}km - {longestRace.miles}miles</Typography>;
+    } else {
+        return null;
+    }
+};
+
+const buildAverageRace = (averageRace) => {
+    if (averageRace && averageRace.kilometers) {
+        return <Typography><b>Average Race Distance: </b> {averageRace.kilometers}km - {averageRace.miles}miles</Typography>;
+    } else {
+        return null;
+    }
+};
+
 function PerformanceStats(props) {
     const { overallStats } = props;
   
@@ -69,6 +109,11 @@ function PerformanceStats(props) {
             {buildBestRace(overallStats.noOfWins, overallStats.bestRace, overallStats.bestRaceId)}
             {buildHighestPlace(overallStats.highestPlace)}
             {buildHighestPercentage(overallStats.highestPercentage)}
+            {buildDistance(overallStats.kilometersRaced, overallStats.milesRaced)}
+            {buildClimbed(overallStats.metersClimbed, overallStats.feetClimbed)}
+            {buildShortestRace(overallStats.shortestRace)}
+            {buildLongestRace(overallStats.longestRace)}
+            {buildAverageRace(overallStats.averageRace)}
         </Paper>
       </React.Fragment>
     );

@@ -21,6 +21,7 @@ import Select from '@material-ui/core/Select';
 
 import RaceDetails from './RaceDetails';
 import RunnerDetails from './RunnerDetails';
+import RaceInfo from './RaceInfo';
 import OverallStats from './OverallStats';
 
 import { search, partialSearch } from './../service/searchService';
@@ -263,10 +264,17 @@ class Search extends PureComponent {
   };
 
   buildRaceResult = race => {
+    let raceInfo;
+
+    if (race.raceInfo) {
+      raceInfo = <RaceInfo raceInfo={race.raceInfo} />;
+    }
+
     return (
       <div key={race.id}>
         <br />
         <RaceDetails race={race} />
+        {raceInfo}
         <RunnerDetails runner={race.runner} />
       </div>
     );
