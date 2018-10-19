@@ -56,13 +56,19 @@ const raceInfoCardStyles = {
 const mapCardStyles = {
   ...margins,
   ['@media (min-width:400px)']: { // eslint-disable-line no-useless-computed-key
-    height: '220px'
+    height: '240px'
   },
   ['@media (min-width:750px)']: { // eslint-disable-line no-useless-computed-key
     height: '370px'
   },
   ['@media (min-width:1000px)']: { // eslint-disable-line no-useless-computed-key
     height: '570px'
+  },
+  ['@media (min-width:1024px)']: { // eslint-disable-line no-useless-computed-key
+    height: '600px'
+  },
+  ['@media (min-width:1400px)']: { // eslint-disable-line no-useless-computed-key
+    height: '750px'
   },
   ['@media (max-width:375px)']: { // eslint-disable-line no-useless-computed-key
     height: '230px'
@@ -90,13 +96,16 @@ const styles = {
     paddingTop: '10px',
     paddingBottom: '20px',
     ['@media (min-width:400px)']: { // eslint-disable-line no-useless-computed-key
-      width: '320px'
+      width: '350px'
     },
     ['@media (min-width:750px)']: { // eslint-disable-line no-useless-computed-key
       width: '600px'
     },
     ['@media (min-width:1000px)']: { // eslint-disable-line no-useless-computed-key
       width: '950px'
+    },
+    ['@media (min-width:1024px)']: { // eslint-disable-line no-useless-computed-key
+      width: '95%'
     },
     ['@media (max-width:375px)']: { // eslint-disable-line no-useless-computed-key
       width: '300px'
