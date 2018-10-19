@@ -1,67 +1,147 @@
 import React from 'react';
+import * as moment from 'moment';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 
-const cardStyles = {
+const margins = {
   marginRight: '10px',
   marginLeft: '5px',
   marginTop: '5px',
   marginBottom: '5px',
-  height: '150px',
+};
+
+const cardStyles = {
+  ...margins,
+  height: '140px',
   ['@media (min-width:400px)']: { // eslint-disable-line no-useless-computed-key
-    height: '230px'
+    height: '250px'
   },
   ['@media (min-width:750px)']: { // eslint-disable-line no-useless-computed-key
     height: '150px'
   },
   ['@media (max-width:375px)']: { // eslint-disable-line no-useless-computed-key
-    height: '240px'
+    height: '300px'
   },
   ['@media (max-width:350px)']: { // eslint-disable-line no-useless-computed-key
-    height: '310px'
+    height: '270px'
   },
   ['@media (max-width:320px)']: { // eslint-disable-line no-useless-computed-key
-    height: '320px'
+    height: '290px'
   },
 };
+
+const raceInfoCardStyles = {
+  ...margins,
+  height: '110px',
+  ['@media (min-width:400px)']: { // eslint-disable-line no-useless-computed-key
+    height: '150px'
+  },
+  ['@media (min-width:750px)']: { // eslint-disable-line no-useless-computed-key
+    height: '130px'
+  },
+  ['@media (max-width:375px)']: { // eslint-disable-line no-useless-computed-key
+    height: '150px'
+  },
+  ['@media (max-width:350px)']: { // eslint-disable-line no-useless-computed-key
+    height: '220px'
+  },
+  ['@media (max-width:320px)']: { // eslint-disable-line no-useless-computed-key
+    height: '145px'
+  },
+};
+
+const mapCardStyles = {
+  ...margins,
+  ['@media (min-width:400px)']: { // eslint-disable-line no-useless-computed-key
+    height: '220px'
+  },
+  ['@media (min-width:750px)']: { // eslint-disable-line no-useless-computed-key
+    height: '370px'
+  },
+  ['@media (min-width:1000px)']: { // eslint-disable-line no-useless-computed-key
+    height: '570px'
+  },
+  ['@media (max-width:375px)']: { // eslint-disable-line no-useless-computed-key
+    height: '230px'
+  },
+  ['@media (max-width:350px)']: { // eslint-disable-line no-useless-computed-key
+    height: '200px'
+  },
+  ['@media (max-width:320px)']: { // eslint-disable-line no-useless-computed-key
+    height: '200px'
+  },
+};
+
+const boxShadow = '0px 0px 9px #50AE55';
 
 const styles = {
   root: {
     flexGrow: 1,
-    marginRight: '10px',
-    marginLeft: '5px',
-    marginTop: '5px',
-    marginBottom: '5px',
+    ...margins,
   },
   cardBody: {
     paddingTop: '10px',
     paddingBottom: '20px',
   },
+  mapCardBody: {
+    paddingTop: '10px',
+    paddingBottom: '20px',
+    ['@media (min-width:400px)']: { // eslint-disable-line no-useless-computed-key
+      width: '320px'
+    },
+    ['@media (min-width:750px)']: { // eslint-disable-line no-useless-computed-key
+      width: '600px'
+    },
+    ['@media (min-width:1000px)']: { // eslint-disable-line no-useless-computed-key
+      width: '950px'
+    },
+    ['@media (max-width:375px)']: { // eslint-disable-line no-useless-computed-key
+      width: '300px'
+    },
+    ['@media (max-width:350px)']: { // eslint-disable-line no-useless-computed-key
+      width: '200px'
+    },
+    ['@media (max-width:320px)']: { // eslint-disable-line no-useless-computed-key
+      width: '265px'
+    },
+  },
+  raceInfoCard: {
+    ...raceInfoCardStyles,
+    '&:hover': {
+      boxShadow,
+    },
+  },
   overallCard: {
     ...cardStyles,
     '&:hover': {
-      boxShadow: '0px 0px 9px #50AE55',
+      boxShadow,
+    },
+  },
+  mapCard: {
+    ...mapCardStyles,
+    '&:hover': {
+      boxShadow,
     },
   },
   categoryCard: {
     ...cardStyles,
     '&:hover': {
-      boxShadow: '0px 0px 9px #50AE55',
+      boxShadow,
     },
   },
   clubCard: {
     ...cardStyles,
     '&:hover': {
-      boxShadow: '0px 0px 9px #50AE55',
+      boxShadow,
     },
   },
   timeCard: {
     ...cardStyles,
     '&:hover': {
-      boxShadow: '0px 0px 9px #50AE55',
+      boxShadow,
     },
   },
   cardTitle: {
@@ -96,23 +176,76 @@ const buildRecords = (raceInfo, classes) => {
     return records;
 }
 
+const buildMap = (raceInfo, classes) => {
+  let map;
+
+  if (raceInfo._latitude > 0) {
+    const altText = `Static Google Map terrain view of ${raceInfo._venue}`;
+    map = <Grid className={classes.root} container>
+        <Grid item xs>
+          <Card className={classes.mapCard}>
+            <CardContent>
+              <Typography variant="body2" className={classes.cardTitle}>
+                Map
+              </Typography>
+              <div>
+                <img className={classes.mapCardBody} src={raceInfo._mapUrl} 
+                    alt={altText} />
+              </div>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>;
+  }
+
+  return map;
+};
+
+const buildGeoLocation = (raceInfo) => {
+  let geoLocation;
+
+  if (raceInfo._latitude > 0) {
+    geoLocation = <Typography variant="subheading"><b>Latitude:</b> {raceInfo._latitude} <b>Longitude:</b> {raceInfo._longitude}</Typography>;
+  }
+
+  return geoLocation;
+};
+
 function RaceInfo(props) {
   const { classes, raceInfo } = props;
   const key = `${raceInfo._date}${raceInfo._time}`;
+  const map = buildMap(raceInfo, classes);
+  const geoLocation = buildGeoLocation(raceInfo);
 
   return (
     <div key={key} className={classes.root}>
+      {map}
       <Grid className={classes.root} container>
         <Grid item xs>
-          <Card className={classes.overallCard}>
+          <Card className={classes.raceInfoCard}>
             <CardContent>
               <Typography variant="body2" className={classes.cardTitle}>
                 Race Information
               </Typography>
               <div className={classes.cardBody}>
-                <Typography variant="subheading">{raceInfo._date} - {raceInfo._time}</Typography>
+                <Typography variant="subheading">{moment(raceInfo._date, 'DD-MM-YYYY').format('dddd Do MMMM YYYY').toString()} - {raceInfo._time}</Typography>
                 <Typography variant="subheading">{raceInfo._distanceKilometers}km / {raceInfo._climbMeters}m</Typography>
                 <Typography variant="subheading">{raceInfo._distanceMiles}miles / {raceInfo._climbFeet}feet</Typography>
+              </div>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+      <Grid className={classes.root} container>
+        <Grid item xs>
+          <Card className={classes.overallCard}>
+            <CardContent>
+              <Typography variant="body2" className={classes.cardTitle}>
+                Venue
+              </Typography>
+              <div className={classes.cardBody}>
+                <Typography variant="subheading">{raceInfo._venue}</Typography>
+                {geoLocation}
               </div>
             </CardContent>
           </Card>
