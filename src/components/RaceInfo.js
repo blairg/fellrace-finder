@@ -1,8 +1,10 @@
 import React from 'react';
 import * as moment from 'moment';
+import { htmlEncode } from 'htmlencode';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 
@@ -188,24 +190,52 @@ const buildRecords = (raceInfo, classes) => {
 const buildMap = (raceInfo, classes) => {
   let map;
 
-  if (raceInfo._latitude > 0) {
-    const altText = `Static Google Map terrain view of ${raceInfo._venue}`;
-    map = <Grid className={classes.root} container>
-        <Grid item xs>
-          <Card className={classes.mapCard}>
-            <CardContent>
-              <Typography variant="body2" className={classes.cardTitle}>
-                Map
-              </Typography>
-              <div>
-                <img className={classes.mapCardBody} src={raceInfo._mapUrl} 
-                    alt={altText} />
-              </div>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>;
-  }
+  // if (raceInfo._latitude > 0) {
+  //   const altText = `Static Google Map terrain view of ${raceInfo._venue}`;
+  //   map = <Grid className={classes.root} container>
+  //       <Grid item xs>
+  //         <Card className={classes.mapCard}>
+  //           <CardContent>
+  //             <Typography variant="body2" className={classes.cardTitle}>
+  //               Map
+  //             </Typography>
+  //             <div>
+  //               <img className={classes.mapCardBody} src={raceInfo._mapUrl} 
+  //                   alt={altText} />
+  //             </div>
+  //           </CardContent>
+  //         </Card>
+  //       </Grid>
+  //     </Grid>;
+  // }
+
+  if (raceInfo._venue != '' && raceInfo._latitude > 0) {
+      const altText = `Static Google Map terrain view of ${raceInfo._venue}`;
+      const encodedVenueAddress = htmlEncode(raceInfo._venue);
+      const mapUrl = `https://www.google.com/maps/embed/v1/place?zoom=9&q=${encodedVenueAddress}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8`;
+
+      const iframeStyle = {
+        height: '400px',
+      };
+      
+      map = <Grid className={classes.root} container>
+          <Grid item xs>
+            <Card>
+                <CardContent>
+                  <Typography variant="body2" className={classes.cardTitle}>
+                    Map
+                  </Typography>
+                  <CardMedia
+                    src={mapUrl}
+                    component="iframe"
+                    title="Google Map"
+                    style={iframeStyle}
+                  />
+                </CardContent>
+            </Card>
+          </Grid>
+        </Grid>;
+    }
 
   return map;
 };
