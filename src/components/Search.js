@@ -32,6 +32,7 @@ import {
   getLocal,
   setLocal,
   removeLocal,
+  removeAllSession,
 } from './../service/storageService';
 import { upperCaseWords } from './../utils/stringUtils';
 
@@ -113,6 +114,8 @@ class Search extends PureComponent {
       value: chosenRunners,
       chosenRace: '',
       chosenRunners: chosenRunners,
+      startIndex: 0,
+      endIndex: 0,
     };
   }
 
@@ -126,12 +129,13 @@ class Search extends PureComponent {
   };
 
   buildClearButton = () => {
+    const { classes } = this.props;
     const clearButton = (
       <MuiThemeProvider theme={clearButtonTheme}>
         <Button
           variant="fab"
           color="primary"
-          className={this.props.classes.clearButton}
+          className={classes.clearButton}
           onClick={this.clearClick}
         >
           <ClearAllIcon />
@@ -163,7 +167,7 @@ class Search extends PureComponent {
       let result;
 
       if (!runnerInStorage) {
-        result = await search(runnerName);
+        result = await search(runnerName, this.state.startIndex, this.state.endIndex);
         setSession({key: cacheKey, value: JSON.stringify(result)});
       } else {
         result = JSON.parse(runnerInStorage);
@@ -179,29 +183,49 @@ class Search extends PureComponent {
     }
   };
 
+  calculateNextEndIndex = (runner, endIndex) => {
+    let nextEndIndex = 0;
+
+    const noOfRaces = runner.overallStats.noOfRaces;
+
+    if (endIndex === 0) {
+      nextEndIndex = 20;
+    } else {
+      if (nextEndIndex > noOfRaces) {
+        nextEndIndex = noOfRaces;
+      } else {
+        nextEndIndex = endIndex + 10;
+      }
+    }
+
+    return nextEndIndex;
+  }
+
   searchForRunners = async runners => {
     if (runners && runners.length > 0) {
+      const { startIndex, endIndex } = this.state;
+      const endIndexDefault = endIndex === 0 ? 10 : endIndex;
       let names = [];
 
       runners.map((eachRunner) => {
         names.push(eachRunner.display);
       });
 
-      const cacheKey = `getRunners${names.join('')}`.replace(' ', '');
+      const cacheKey = `getRunners${names.join('')}${startIndex}${endIndexDefault}`.replace(' ', '');
       const runnersInStorage = getSession(cacheKey);
-      let result;
+      let runnersDetails;
 
       if (!runnersInStorage) {
-        result = await search(names);
-        setSession({key: cacheKey, value: JSON.stringify(result)});
+        runnersDetails = await search(names, startIndex, endIndexDefault);
+        setSession({key: cacheKey, value: JSON.stringify(runnersDetails)});
 
-        return result;
+        return runnersDetails;
       } else {
-        result = JSON.parse(runnersInStorage);
+        runnersDetails = JSON.parse(runnersInStorage);
         removeSession(cacheKey);
       }
 
-      return result;
+      return runnersDetails;
     }
 
     return null;
@@ -231,6 +255,8 @@ class Search extends PureComponent {
     });
 
     removeLocal(chosenRunnersKey);
+    removeAllSession();
+
     scroll.scrollToTop();
   };
 
@@ -280,21 +306,41 @@ class Search extends PureComponent {
     );
   };
 
+  loadMoreOnClick = async event => {
+    event.preventDefault();
+    const { chosenRunners } = this.state;
+
+    await this.onChange(chosenRunners);
+  };
+
+  buildLoadMoreButton = (numberOfRaces) => {
+    const { endIndex } = this.state;
+    let loadMore;
+
+    if (numberOfRaces > (endIndex - 10)) {
+      loadMore = <React.Fragment>
+                  <Button variant="contained" color="secondary" onClick={this.loadMoreOnClick}>Load More</Button>
+                  <br />
+                  <br />
+                  <br />
+                 </React.Fragment>;
+    }
+
+    return loadMore;
+  }
+
   onChange = async runnerNames => {
     if (runnerNames.length > 0) {
-      let chosenRunners = [];
-
-      this.setState({
-        loadingResults: true,
-      });
-
+      const { endIndex } = this.state;
       const runnersDetails = await this.searchForRunners(runnerNames);
+      const newEndIndex = this.calculateNextEndIndex(runnersDetails, endIndex);
   
       this.setState({
         runner: runnersDetails,
         runnerName: runnerNames[0].display,
         loadingResults: false,
         chosenRunners: runnerNames,
+        endIndex: newEndIndex,
       });
 
       setLocal({key: chosenRunnersKey, value: runnerNames});
@@ -339,52 +385,8 @@ class Search extends PureComponent {
     this.scrollToTop();
   };
 
-  // @TODO: Break me down please...
   populateRaceSelect = () => {
-    let uniqueRaceList = [];
-
-    this.state.runner.races.map(race => {
-      if (!uniqueRaceList.includes(race.name)) {
-        uniqueRaceList.push(race.name);
-      }
-    });
-
-    uniqueRaceList = uniqueRaceList.sort();
-    let filteredUniqueRaceList = [];
-
-    uniqueRaceList.map(race => {
-      const splitRaceName = race.split('-');
-
-      if (splitRaceName.length > 1) {
-        const raceItem = {
-          display: splitRaceName[0].trim(),
-          original: race,
-        };
-
-        if (
-          filteredUniqueRaceList.filter(e => e.display === raceItem.display)
-            .length === 0
-        ) {
-          filteredUniqueRaceList.push(raceItem);
-        } else {
-          for (let i = 0; i < filteredUniqueRaceList.length; i++) {
-            if (filteredUniqueRaceList[i].display === raceItem.display) {
-              filteredUniqueRaceList[i].original += `||${race}`;
-              break;
-            }
-          }
-        }
-      } else {
-        if (
-          filteredUniqueRaceList.filter(e => e.display === race).length === 0
-        ) {
-          filteredUniqueRaceList.push({
-            display: race,
-            original: race,
-          });
-        }
-      }
-    });
+    const { raceNames } = this.state.runner;
 
     let raceSelectItems = [
       <MenuItem key="all" value="all">
@@ -392,10 +394,10 @@ class Search extends PureComponent {
       </MenuItem>,
     ];
 
-    filteredUniqueRaceList.map(race => {
+    raceNames.map(eachRace => {
       raceSelectItems.push(
-        <MenuItem key={race.original} value={race.original}>
-          {race.display}
+        <MenuItem key={eachRace.original} value={eachRace.original}>
+          {eachRace.display}
         </MenuItem>,
       );
     });
@@ -431,6 +433,7 @@ class Search extends PureComponent {
 
   render() {
     // @TODO: Tidy this up getting very cluttered
+    const { runner, chosenRace, loadingResults, sticky, chosenRunners, endIndex } = this.state;
     const { classes } = this.props;
     const searchClass = this.state.sticky ? classes.search : '';
     let clearButton;
@@ -439,21 +442,22 @@ class Search extends PureComponent {
     let loadingProgress;
     let scrollToTopButton;
     let racesSelect;
+    let loadMoreButton;
 
-    if (this.state.runner != null && this.state.runner.races && this.state.runner.races.length > 0) {
+    if (runner != null && runner.races && runner.races.length > 0) {
       // Display clear button
       clearButton = this.buildClearButton();
       overallStats = this.populateOverallStats();
-
-      const racesForRunner = this.state.runner.races;
+      const racesForRunner = runner.races;
+      loadMoreButton = this.buildLoadMoreButton(runner.overallStats.noOfRaces, endIndex);
 
       // Filtering races
-      if (this.state.chosenRace === '') {
+      if (chosenRace === '') {
         raceResults = racesForRunner.map(race => this.buildRaceResult(race));
       } else {
         // Filtering by a chosen race
         let filteredRaces = [];
-        const listOfChosenRaces = this.state.chosenRace.split('||');
+        const listOfChosenRaces = chosenRace.split('||');
 
         if (listOfChosenRaces.length > 1) {
           listOfChosenRaces.map(chosenRace => {
@@ -465,8 +469,8 @@ class Search extends PureComponent {
             }
           });
         } else {
-          filteredRaces = this.state.runner.races.filter(
-            race => race.name === this.state.chosenRace,
+          filteredRaces = runner.races.filter(
+            race => race.name === chosenRace,
           );
         }
 
@@ -476,17 +480,17 @@ class Search extends PureComponent {
       // Populating races drop down
       racesSelect = this.populateRaceSelect();
     } else if (
-      this.state.runner != null &&
-      this.state.runner.races.length === 0
+      runner != null &&
+      runner.races.length === 0
     ) {
       raceResults = this.noResultsFound(classes.noRaces);
     }
 
-    if (this.state.loadingResults) {
+    if (loadingResults) {
       loadingProgress = this.loadingProgress();
     }
 
-    if (this.state.sticky) {
+    if (sticky) {
       scrollToTopButton = (
         <span className={classes.scrollToTopButton}>
           <Button
@@ -515,7 +519,7 @@ class Search extends PureComponent {
             loadOptions={this.getRunners}
             placeholder="Search Runner"
             noResultsText="No runners found"
-            value={this.state.chosenRunners}
+            value={chosenRunners}
             multi={true}
             ignoreAccents={false}
           />
@@ -525,6 +529,7 @@ class Search extends PureComponent {
         {loadingProgress}
         {overallStats}
         {raceResults}
+        {loadMoreButton}
         {scrollToTopButton}
       </React.Fragment>
     );
