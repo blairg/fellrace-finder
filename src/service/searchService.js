@@ -15,7 +15,25 @@ export async function search(runnerNames, startIndex, endIndex) {
     )
     .then(function(response) {
       races = response.data;
-      console.log(races);
+      return races;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+
+  return races;
+}
+
+export async function searchByRace(runnerNames, raceNames) {
+  const runnersNamedJoined = runnerNames.join('$$');
+  let races = null;
+
+  await axios
+    .get(
+      `${process.env.REACT_APP_API_SERVER}/runnerByRace/${runnersNamedJoined}/${raceNames}`,
+    )
+    .then(function(response) {
+      races = response.data;
       return races;
     })
     .catch(function(error) {
