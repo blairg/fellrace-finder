@@ -1,12 +1,4 @@
-Races filter
-Club filter
-Category filter
-Year filter
-Use prop types 
-Use flow
+React Suspense/Lazy
+
+Typescript?
 Improve Serviceworker cache site for offline
-
-
-
-Mongo work for all Clubs
-db.createView("distinctCollectionClubs", "races", [{ $group: { _id: "$runners.club"}}]);

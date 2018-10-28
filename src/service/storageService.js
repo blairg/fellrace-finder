@@ -20,6 +20,10 @@ export function removeSession(key) {
   }
 }
 
+export function removeAllSession() {
+  sessionStorage.clear();
+}
+
 export function setLocal({key, value}){
     if (value !== "null") {
         localStorage.setItem(key, JSON.stringify(value));
@@ -40,4 +44,8 @@ export function removeLocal(key) {
   if (key) {
     localStorage.removeItem(key);
   }
+}
+
+export function removeAllLocal() {
+  localStorage.clear();
 }
