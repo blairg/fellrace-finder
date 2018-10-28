@@ -1,6 +1,6 @@
 {
   "name": "fellrace-finder",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "private": false,
   "homepage": "https://blairg.github.io/fellrace-finder",
   "dependencies": {
