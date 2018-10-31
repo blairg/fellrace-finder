@@ -454,13 +454,18 @@ class Search extends PureComponent {
       // Filtering races
       if (chosenRace === '') {
         raceResults = racesForRunner.map(race => this.buildRaceResult(race));
+
+        // Load more button
+        if (runner.overallStats.noOfRaces > endIndex) {
+          loadMoreButton = <LoadMoreButton onClick={this.loadMoreOnClick} />;
+        }
       } else {
         raceResults = this.buildChosenRaceList(chosenRace, runner.races);
-      }
 
-      // Load more button
-      if (runner.overallStats.noOfRaces > endIndex) {
-        loadMoreButton = <LoadMoreButton onClick={this.loadMoreOnClick} />;
+        // Load more button
+        if (runner.races > endIndex) {
+          loadMoreButton = <LoadMoreButton onClick={this.loadMoreOnClick} />;
+        }
       }
 
       // Populating races drop down
