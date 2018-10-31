@@ -440,6 +440,11 @@ class Search extends PureComponent {
     let loadMoreLoadingProgress;
     let downwardArrowButtonShow;
 
+    // loading main race results
+    if (loadingResults) {
+      loadingProgress = this.loadingProgress();
+    }
+
     if (runner != null && runner.races && runner.races.length > 0) {
       // Display clear button
       clearButton = this.buildClearButton();
@@ -466,11 +471,6 @@ class Search extends PureComponent {
           onChange={this.handleChooseRaceChange}
         />
       );
-
-      // loading main race results
-      if (loadingResults) {
-        loadingProgress = this.loadingProgress();
-      }
 
       // loading more results
       if (loadMoreLoading) {
