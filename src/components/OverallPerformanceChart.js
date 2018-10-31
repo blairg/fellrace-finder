@@ -5,20 +5,23 @@ import Chart from 'chart.js';
 
 ReactChartkick.addAdapter(Chart);
 
-const styles = theme => ({
-
-});
+const styles = theme => ({});
 
 function OverallPerformanceChart(props) {
-    const { overallRaceData } = props;
-  
-    return (
-      <React.Fragment>
-        <AreaChart download={true} suffix="%" title='Overall Performance'
-                   colors={["#9B2FAE", "#666"]} data={overallRaceData} 
-                   xtitle="Race Date" ytitle="Performance" 
-        />
-      </React.Fragment>
+  const { overallRaceData } = props;
+
+  return (
+    <React.Fragment>
+      <AreaChart
+        download={true}
+        suffix="%"
+        title="Overall Performance"
+        colors={['#9B2FAE', '#666']}
+        data={overallRaceData}
+        xtitle="Race Date"
+        ytitle="Performance"
+      />
+    </React.Fragment>
   );
 }
 

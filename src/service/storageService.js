@@ -1,4 +1,4 @@
-export function setSession({key, value}) {
+export function setSession({ key, value }) {
   if (value !== 'null') {
     sessionStorage.setItem(key, JSON.stringify(value));
   }
@@ -24,21 +24,21 @@ export function removeAllSession() {
   sessionStorage.clear();
 }
 
-export function setLocal({key, value}){
-    if (value !== "null") {
-        localStorage.setItem(key, JSON.stringify(value));
-    }
-};
+export function setLocal({ key, value }) {
+  if (value !== 'null') {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+}
 
-export function getLocal(key){
-    const value = localStorage.getItem(key);
+export function getLocal(key) {
+  const value = localStorage.getItem(key);
 
-    if (value) {
-        return JSON.parse(value);
-    }
+  if (value) {
+    return JSON.parse(value);
+  }
 
-    return value;
-};
+  return value;
+}
 
 export function removeLocal(key) {
   if (key) {

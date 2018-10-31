@@ -1,9 +1,6 @@
 import axios from 'axios';
 
-import {
-  getSession,
-  setSession,
-} from './../service/storageService';
+import { getSession, setSession } from './../service/storageService';
 
 export async function search(runnerNames, startIndex, endIndex) {
   const runnersNamedJoined = runnerNames.join('$$');
@@ -11,7 +8,9 @@ export async function search(runnerNames, startIndex, endIndex) {
 
   await axios
     .get(
-      `${process.env.REACT_APP_API_SERVER}/runner/${runnersNamedJoined}/${startIndex}/${endIndex}`,
+      `${
+        process.env.REACT_APP_API_SERVER
+      }/runner/${runnersNamedJoined}/${startIndex}/${endIndex}`,
     )
     .then(function(response) {
       races = response.data;
@@ -30,7 +29,9 @@ export async function searchByRace(runnerNames, raceNames) {
 
   await axios
     .get(
-      `${process.env.REACT_APP_API_SERVER}/runnerByRace/${runnersNamedJoined}/${raceNames}`,
+      `${
+        process.env.REACT_APP_API_SERVER
+      }/runnerByRace/${runnersNamedJoined}/${raceNames}`,
     )
     .then(function(response) {
       races = response.data;
@@ -49,16 +50,17 @@ export function partialSearch(partialName) {
 
   if (runnersInSessionStorage) {
     return { options: runnersInSessionStorage };
-  } 
+  }
 
   const url = `${
     process.env.REACT_APP_API_SERVER
   }/autocomplete/runner/${partialName.toLowerCase()}`;
 
   return fetch(url)
-    .then((response) => {
+    .then(response => {
       return response.json();
-    }).then((json) => {
+    })
+    .then(json => {
       const runnersList = [];
 
       json.items.map(runner => {
@@ -81,7 +83,7 @@ export function partialSearch(partialName) {
         return found;
       });
 
-      setSession({key: cacheKey, value: runnersList});
+      setSession({ key: cacheKey, value: runnersList });
 
       return { options: runnersList };
     });

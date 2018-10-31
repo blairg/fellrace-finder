@@ -37,16 +37,23 @@ class App extends PureComponent {
     return (
       <MuiThemeProvider theme={muiTheme}>
         <CssBaseline />
-        <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"></link>
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          as="style"
+        />
         <link
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet"
         />
-        <link rel="dns-prefetch" href="//fonts.googleapis.com"></link>
-        <link rel="dns-prefetch" href="//storage.googleapis.com"></link>
-        <link href="//storage.googleapis.com" rel="preconnect" crossOrigin="true"></link>
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//storage.googleapis.com" />
+        <link
+          href="//storage.googleapis.com"
+          rel="preconnect"
+          crossOrigin="true"
+        />
         <div style={styles.container}>
-        
           <header>
             <img src={runnerImage} alt="runner" />
           </header>
