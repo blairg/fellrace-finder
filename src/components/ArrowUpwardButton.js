@@ -24,4 +24,4 @@ function UpwardArrowButton(props) {
   );
 }
 
-export default withStyles(styles)(UpwardArrowButton);
+export default withStyles(styles)(React.memo(UpwardArrowButton));

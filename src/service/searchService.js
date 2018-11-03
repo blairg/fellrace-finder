@@ -1,6 +1,9 @@
 import axios from 'axios';
+import { AllHtmlEntities } from 'html-entities';
 
-import { getSession, setSession } from './../service/storageService';
+import { getSession, setSession } from './storageService';
+
+const entities = new AllHtmlEntities();
 
 export async function search(runnerNames, startIndex, endIndex) {
   const runnersNamedJoined = runnerNames.join('$$');
@@ -25,13 +28,15 @@ export async function search(runnerNames, startIndex, endIndex) {
 
 export async function searchByRace(runnerNames, raceNames) {
   const runnersNamedJoined = runnerNames.join('$$');
+  let encodedRaceNames = raceNames.replace('/', '**');
+  encodedRaceNames = entities.encode(encodedRaceNames);
   let races = null;
 
   await axios
     .get(
       `${
         process.env.REACT_APP_API_SERVER
-      }/runnerByRace/${runnersNamedJoined}/${raceNames}`,
+      }/runnerByRace/${runnersNamedJoined}/${encodedRaceNames}`,
     )
     .then(function(response) {
       races = response.data;
@@ -49,7 +54,9 @@ export function partialSearch(partialName) {
   const runnersInSessionStorage = getSession(cacheKey);
 
   if (runnersInSessionStorage) {
-    return { options: runnersInSessionStorage };
+    return {
+      options: runnersInSessionStorage,
+    };
   }
 
   const url = `${
@@ -83,8 +90,13 @@ export function partialSearch(partialName) {
         return found;
       });
 
-      setSession({ key: cacheKey, value: runnersList });
+      setSession({
+        key: cacheKey,
+        value: runnersList,
+      });
 
-      return { options: runnersList };
+      return {
+        options: runnersList,
+      };
     });
 }

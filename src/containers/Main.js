@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Suspense } from 'react';
 import { animateScroll as scroll } from 'react-scroll';
 import { Async } from 'react-select';
 import _ from 'lodash';
@@ -6,18 +6,10 @@ import 'react-select/dist/react-select.css';
 
 // Material-UI
 import { withStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-import RaceDetails from './RaceDetails';
-import RaceDropDown from './RaceDropDown';
-import RunnerDetails from './RunnerDetails';
-import RaceInfo from './RaceInfo';
-import OverallStats from './OverallStats';
-import LoadMoreButton from './LoadMoreButton';
-import ArrowUpwardButton from './ArrowUpwardButton';
-import ArrowDownwardButton from './ArrowDownwardButton';
-import ClearButton from './ClearButton';
-import LoadingProgress from './LoadingProgress';
-import NoResults from './NoResults';
+import LoadingProgress from './../components/LoadingProgress';
+import NoResults from './../components/NoResults';
 
 import {
   search,
@@ -35,6 +27,16 @@ import {
 } from './../service/storageService';
 import { upperCaseWords } from './../utils/stringUtils';
 
+const ArrowUpwardButton = React.lazy(() => import('./../components/ArrowUpwardButton'));
+const ArrowDownwardButton = React.lazy(() => import('./../components/ArrowDownwardButton'));
+const ClearButton = React.lazy(() => import('./../components/ClearButton'));
+const RaceDetails = React.lazy(() => import('./../components/RaceDetails'));
+const RunnerDetails = React.lazy(() => import('./../components/RunnerDetails'));
+const RaceInfo = React.lazy(() => import('./../components/RaceInfo'));
+const RaceDropDown = React.lazy(() => import('./../components/RaceDropDown'));
+const OverallStats = React.lazy(() => import('./../components/OverallStats'));
+const LoadMoreButton = React.lazy(() => import('./../components/LoadMoreButton'));
+
 const styles = theme => ({
   searchField: {
     paddingBottom: '5px',
@@ -49,11 +51,14 @@ const styles = theme => ({
     backgroundColor: 'white',
     zIndex: '2 !important',
   },
+  progress: {
+    margin: theme.spacing.unit * 2,
+  },
 });
 
 const chosenRunnersKey = 'chosenRunners';
 
-class Search extends PureComponent {
+class Main extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -71,7 +76,7 @@ class Search extends PureComponent {
       runner: null,
       races: null,
       sticky: false,
-      loadingResults: false,
+      loadingResults: true,
       value: chosenRunners,
       chosenRace: '',
       chosenRunners: chosenRunners,
@@ -91,7 +96,9 @@ class Search extends PureComponent {
   };
 
   buildClearButton = () => {
-    return <ClearButton onClick={this.clearClick} />;
+    return <Suspense fallback={<CircularProgress className={styles.prototypeprogress} />}>
+            <ClearButton onClick={this.clearClick} />
+          </Suspense>;
   };
 
   onScroll = () => {
@@ -246,15 +253,21 @@ class Search extends PureComponent {
     let raceInfo;
 
     if (race.raceInfo) {
-      raceInfo = <RaceInfo raceInfo={race.raceInfo} />;
+      raceInfo = <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                  <RaceInfo raceInfo={race.raceInfo} />
+                </Suspense>;
     }
 
     return (
       <div key={race.id}>
         <br />
-        <RaceDetails race={race} />
+        <Suspense fallback={<CircularProgress className={styles.progress} />}>
+          <RaceDetails race={race} />
+        </Suspense>
         {raceInfo}
-        <RunnerDetails runner={race.runner} />
+        <Suspense fallback={<CircularProgress className={styles.progress} />}>
+          <RunnerDetails runner={race.runner} />
+        </Suspense>
       </div>
     );
   };
@@ -389,7 +402,9 @@ class Search extends PureComponent {
     const { runner } = this.state;
 
     if (runner.overallStats) {
-      return <OverallStats overallStats={runner.overallStats} />;
+      return  <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                <OverallStats overallStats={runner.overallStats} />
+              </Suspense>;
     }
 
     return null;
@@ -428,8 +443,8 @@ class Search extends PureComponent {
       endIndex,
       loadMoreLoading,
     } = this.state;
-    const { classes } = this.props;
-    const searchClass = sticky ? classes.search : '';
+    const { progress, searchField, search } = this.props.classes;
+    const searchClass = sticky ? search : '';
     let clearButton;
     let overallStats;
     let raceResults;
@@ -457,24 +472,30 @@ class Search extends PureComponent {
 
         // Load more button
         if (runner.overallStats.noOfRaces > endIndex) {
-          loadMoreButton = <LoadMoreButton onClick={this.loadMoreOnClick} />;
+          loadMoreButton = <Suspense fallback={<CircularProgress className={progress} />}>
+                            <LoadMoreButton onClick={this.loadMoreOnClick} />
+                          </Suspense>;
         }
       } else {
         raceResults = this.buildChosenRaceList(chosenRace, runner.races);
 
         // Load more button
         if (runner.races > endIndex) {
-          loadMoreButton = <LoadMoreButton onClick={this.loadMoreOnClick} />;
+          loadMoreButton = <Suspense fallback={<CircularProgress className={progress} />}>
+                             <LoadMoreButton onClick={this.loadMoreOnClick} />
+                           </Suspense>;
         }
       }
 
       // Populating races drop down
       racesSelect = (
-        <RaceDropDown
-          raceNames={runner.raceNames}
-          chosenRace={chosenRace}
-          onChange={this.handleChooseRaceChange}
-        />
+        <Suspense fallback={<CircularProgress className={progress} />}>
+                             <RaceDropDown
+                                raceNames={runner.raceNames}
+                                chosenRace={chosenRace}
+                                onChange={this.handleChooseRaceChange}
+                              />
+        </Suspense>
       );
 
       // loading more results
@@ -484,12 +505,16 @@ class Search extends PureComponent {
         scroll.scrollMore(170);
       } else {
         downwardArrowButtonShow = (
-          <ArrowDownwardButton onClick={this.scrollToBottomClick} />
+          <Suspense fallback={<CircularProgress className={progress} />}>
+                  <ArrowDownwardButton onClick={this.scrollToBottomClick} />
+                </Suspense>
         );
 
         if (sticky) {
           scrollToTopButton = (
-            <ArrowUpwardButton onClick={this.scrollToTopClick} />
+            <Suspense fallback={<CircularProgress className={progress} />}>
+                  <ArrowUpwardButton onClick={this.scrollToTopClick} />
+                </Suspense>
           );
         }
       }
@@ -503,7 +528,7 @@ class Search extends PureComponent {
           <Async
             cacheOptions
             defaultOptions
-            className={classes.searchField}
+            className={searchField}
             valueKey="original"
             labelKey="display"
             matchProp="any"
@@ -531,4 +556,4 @@ class Search extends PureComponent {
   }
 }
 
-export default withStyles(styles)(Search);
+export default withStyles(styles)(Main);

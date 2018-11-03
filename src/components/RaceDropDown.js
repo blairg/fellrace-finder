@@ -50,4 +50,4 @@ function RaceDropDown(props) {
   return raceSelector;
 }
 
-export default withStyles(styles)(RaceDropDown);
+export default withStyles(styles)(React.memo(RaceDropDown));

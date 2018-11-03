@@ -1,3 +1,6 @@
+
+[![Known Vulnerabilities](https://snyk.io/test/github/blairg/fellrace-finder/badge.svg)](https://snyk.io/test/github/blairg/fellrace-finder)
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>

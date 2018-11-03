@@ -5,6 +5,9 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
+import { LazyImage } from 'react-lazy-images';
+
+import lowResMap from './../images/maplowres.jpg';
 
 const margins = {
   marginRight: '10px',
@@ -234,10 +237,14 @@ const buildMap = (raceInfo, classes) => {
                 Map
               </Typography>
               <div>
-                <img
-                  className={classes.mapCardBody}
+                <LazyImage
                   src={raceInfo._mapUrl}
+                  className={classes.mapCardBody}
                   alt={altText}
+                  placeholder={({ imageProps, ref }) => (
+                    <img className={classes.mapCardBody} ref={ref} src={lowResMap} alt={imageProps.alt} />
+                  )}
+                  actual={({ imageProps }) => <img {...imageProps} />}
                 />
               </div>
             </CardContent>
@@ -322,4 +329,4 @@ function RaceInfo(props) {
   );
 }
 
-export default withStyles(styles)(RaceInfo);
+export default withStyles(styles)(React.memo(RaceInfo));

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,10 +12,11 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Grid from '@material-ui/core/Grid';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-import PerformanceStats from './PerformanceStats';
-import AveragePerformanceChart from './AveragePerformanceChart';
-import OverallPerformanceChart from './OverallPerformanceChart';
+const PerformanceStats = React.lazy(() => import('./PerformanceStats'));
+const AveragePerformanceChart = React.lazy(() => import('./AveragePerformanceChart'));
+const OverallPerformanceChart = React.lazy(() => import('./OverallPerformanceChart'));
 
 const HeaderTableCell = withStyles(theme => ({
   root: {
@@ -38,6 +39,9 @@ const styles = theme => ({
   expansionPanel: {
     marginTop: '5px',
     marginBottom: '15px',
+  },
+  progress: {
+    margin: theme.spacing.unit * 2,
   },
 });
 
@@ -140,7 +144,9 @@ function OverallStats(props) {
         <ExpansionPanelDetails>
           <Grid container>
             <Grid item xs={12}>
-              <PerformanceStats overallStats={overallStats} />
+              <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                <PerformanceStats overallStats={overallStats} />
+              </Suspense>
             </Grid>
             <Grid item xs={12}>
               <Paper className={classes.root}>
@@ -205,23 +211,29 @@ function OverallStats(props) {
         <ExpansionPanelDetails>
           <Grid container>
             <Grid item xs={12}>
-              <OverallPerformanceChart
-                overallRaceData={overallStats.overallRaceData}
-              />
+              <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                <OverallPerformanceChart
+                    overallRaceData={overallStats.overallRaceData}
+                  />
+              </Suspense>
             </Grid>
             <Grid item xs={12}>
-              <AveragePerformanceChart
-                performanceData={overallStats.performanceByMonthData}
-                title={'Average Performance By Month'}
-                xTitle={'Year/Month'}
-              />
+              <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                <AveragePerformanceChart
+                  performanceData={overallStats.performanceByMonthData}
+                  title={'Average Performance By Month'}
+                  xTitle={'Year/Month'}
+                />
+              </Suspense>
             </Grid>
             <Grid item xs={12}>
-              <AveragePerformanceChart
-                performanceData={overallStats.performanceByYearData}
-                title={'Average Performance By Year'}
-                xTitle={'Year'}
-              />
+            <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                <AveragePerformanceChart
+                    performanceData={overallStats.performanceByYearData}
+                    title={'Average Performance By Year'}
+                    xTitle={'Year'}
+                  />
+              </Suspense>
             </Grid>
           </Grid>
         </ExpansionPanelDetails>
@@ -230,4 +242,4 @@ function OverallStats(props) {
   );
 }
 
-export default withStyles(styles)(OverallStats);
+export default withStyles(styles)(React.memo(OverallStats));

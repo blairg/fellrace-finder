@@ -25,4 +25,4 @@ function OverallPerformanceChart(props) {
   );
 }
 
-export default withStyles(styles)(OverallPerformanceChart);
+export default withStyles(styles)(React.memo(OverallPerformanceChart));

@@ -19,4 +19,4 @@ function LoadMoreButton(props) {
   );
 }
 
-export default withStyles(styles)(LoadMoreButton);
+export default withStyles(styles)(React.memo(LoadMoreButton));

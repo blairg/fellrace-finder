@@ -25,4 +25,4 @@ function AveragePerformanceChart(props) {
   );
 }
 
-export default withStyles(styles)(AveragePerformanceChart);
+export default withStyles(styles)(React.memo(AveragePerformanceChart));

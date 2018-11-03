@@ -21,6 +21,7 @@ function RaceDetails(props) {
           <a
             href={race.resultsUrl}
             target="_blank"
+            rel="noopener noreferrer"
             className={classes.raceButton}
           >
             {race.name} - {race.date}
@@ -32,4 +33,4 @@ function RaceDetails(props) {
 }
 
 // @TODO: Can parse all races and get info like elevation, location, hyperlink for race.
-export default withStyles(styles)(RaceDetails);
+export default withStyles(styles)(React.memo(RaceDetails));

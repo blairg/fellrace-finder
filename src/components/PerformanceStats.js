@@ -45,7 +45,7 @@ const buildBestRace = (noOfWins, bestRace, bestRaceId) => {
     return (
       <Typography>
         <b>Best Race: </b>{' '}
-        <a href={raceLink} target="_blank">
+        <a href={raceLink} target="_blank" rel="noopener noreferrer">
           {bestRace}
         </a>
       </Typography>
@@ -185,4 +185,4 @@ function PerformanceStats(props) {
   );
 }
 
-export default withStyles(styles)(PerformanceStats);
+export default withStyles(styles)(React.memo(PerformanceStats));

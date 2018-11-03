@@ -24,4 +24,4 @@ function ArrowDownwardButton(props) {
   );
 }
 
-export default withStyles(styles)(ArrowDownwardButton);
+export default withStyles(styles)(React.memo(ArrowDownwardButton));

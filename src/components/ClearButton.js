@@ -45,4 +45,4 @@ function ClearButton(props) {
   return clearButton;
 }
 
-export default withStyles(styles)(ClearButton);
+export default withStyles(styles)(React.memo(ClearButton));

@@ -82,5 +82,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Projest specific
+# Project specific
 dataFiles
+package-lock.json

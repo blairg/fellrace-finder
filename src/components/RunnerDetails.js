@@ -154,4 +154,4 @@ function RunnerDetails(props) {
   );
 }
 
-export default withStyles(styles)(RunnerDetails);
+export default withStyles(styles)(React.memo(RunnerDetails));
