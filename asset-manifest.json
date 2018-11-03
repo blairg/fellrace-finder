@@ -1,16 +1,4 @@
 {
-  "main.css": "/fellrace-finder/static/css/main.ea502897.chunk.css",
-  "main.js": "/fellrace-finder/static/js/main.6b9009ed.chunk.js",
-  "main.js.map": "/fellrace-finder/static/js/main.6b9009ed.chunk.js.map",
-  "static/css/1.a03d88dd.chunk.css": "/fellrace-finder/static/css/1.a03d88dd.chunk.css",
-  "static/js/1.a432397e.chunk.js": "/fellrace-finder/static/js/1.a432397e.chunk.js",
-  "static/js/1.a432397e.chunk.js.map": "/fellrace-finder/static/js/1.a432397e.chunk.js.map",
-  "runtime~main.js": "/fellrace-finder/static/js/runtime~main.c1bc48b2.js",
-  "runtime~main.js.map": "/fellrace-finder/static/js/runtime~main.c1bc48b2.js.map",
-  "static/media/index.css": "/fellrace-finder/static/media/roboto-latin-900italic.bc833e72.woff",
-  "static/css/1.a03d88dd.chunk.css.map": "/fellrace-finder/static/css/1.a03d88dd.chunk.css.map",
-  "static/css/main.ea502897.chunk.css.map": "/fellrace-finder/static/css/main.ea502897.chunk.css.map",
-  "index.html": "/fellrace-finder/index.html",
-  "precache-manifest.7822a2eff3efbd931867df535d23a8aa.js": "/fellrace-finder/precache-manifest.7822a2eff3efbd931867df535d23a8aa.js",
-  "service-worker.js": "/fellrace-finder/service-worker.js"
+  "main.js": "static/js/main.01c24579.js",
+  "main.js.map": "static/js/main.01c24579.js.map"
 }
