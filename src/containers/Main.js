@@ -1,4 +1,5 @@
 import React, { PureComponent, Suspense } from 'react';
+import { connect } from 'react-redux';
 import { animateScroll as scroll } from 'react-scroll';
 import { Async } from 'react-select';
 import _ from 'lodash';
@@ -8,6 +9,7 @@ import 'react-select/dist/react-select.css';
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
+import { partialNameAction } from './../actions/search';
 import LoadingProgress from './../components/LoadingProgress';
 import NoResults from './../components/NoResults';
 
@@ -429,8 +431,14 @@ class Main extends PureComponent {
       }
     }
 
+    this.partialNameAction();
+
     return filteredRaces.map(race => this.buildRaceResult(race));
   };
+
+  partialNameAction = (event) => {
+    this.props.partialNameAction();
+   }
 
   render() {
     // @TODO: Tidy this up getting very cluttered
@@ -556,4 +564,12 @@ class Main extends PureComponent {
   }
 }
 
-export default withStyles(styles)(Main);
+const mapStateToProps = state => ({
+  ...state
+ });
+
+ const mapDispatchToProps = dispatch => ({
+  partialNameAction: () => dispatch(partialNameAction())
+ });
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Main));
