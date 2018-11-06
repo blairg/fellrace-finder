@@ -370,7 +370,7 @@ class Main extends PureComponent {
     }
   };
 
-  debouncedFetchRunners = _.debounce(this.fetchRunners, 350);
+  debouncedFetchRunners = _.debounce(this.fetchRunners, 100);
 
   getRunners = (searchValue, callback) => {
     if (!searchValue || searchValue.length < 3) {
