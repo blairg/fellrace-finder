@@ -9,7 +9,7 @@ import 'react-select/dist/react-select.css';
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { partialNameAction } from './../actions/search';
+import { partialNameAction, loadingProgressAction } from './../actions/search';
 import LoadingProgress from './../components/LoadingProgress';
 import NoResults from './../components/NoResults';
 
@@ -309,6 +309,8 @@ class Main extends PureComponent {
 
   onChange = async runnerNames => {
     if (runnerNames.length > 0) {
+      this.props.dispatchLoadingProgress(true);
+
       this.setState({
         loadingResults: true,
       });
@@ -326,6 +328,8 @@ class Main extends PureComponent {
         endIndex: newEndIndex,
         chosenRace: '',
       });
+
+      this.props.dispatchLoadingProgress(false);
 
       setLocal({ key: chosenRunnersKey, value: runnerNames });
     } else {
@@ -431,14 +435,8 @@ class Main extends PureComponent {
       }
     }
 
-    this.partialNameAction();
-
     return filteredRaces.map(race => this.buildRaceResult(race));
   };
-
-  partialNameAction = (event) => {
-    this.props.partialNameAction();
-   }
 
   render() {
     // @TODO: Tidy this up getting very cluttered
@@ -569,7 +567,8 @@ const mapStateToProps = state => ({
  });
 
  const mapDispatchToProps = dispatch => ({
-  partialNameAction: () => dispatch(partialNameAction())
+  dispatchPartialName: () => dispatch(partialNameAction()),
+  dispatchLoadingProgress: (loadingProgress) => dispatch(loadingProgressAction(loadingProgress)),
  });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Main));
