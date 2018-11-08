@@ -1,0 +1,1 @@
+export const STICKY_ACTION = 'STICKY_ACTION';

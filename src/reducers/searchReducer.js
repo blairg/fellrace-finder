@@ -11,7 +11,7 @@ export default (state = {}, action) => {
             }
         case LOADING_PROGRESS_ACTION:
             return {
-                result: action.payload
+                loadingProgress: action.payload
             }
         default:
             return state

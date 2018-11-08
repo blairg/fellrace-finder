@@ -10,7 +10,7 @@ export const partialNameAction = () => dispatch => {
     });
 };
 
-export const loadingProgressAction = (loadingProgress) => dispatch => {
+export const loadingProgressAction = (loadingProgress = true) => dispatch => {
     dispatch({
         type: LOADING_PROGRESS_ACTION,
         payload: loadingProgress,
