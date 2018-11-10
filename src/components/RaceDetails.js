@@ -2,6 +2,7 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import EjectIcon from '@material-ui/icons/Eject';
 
 const styles = {
   raceButton: {
@@ -17,7 +18,8 @@ function RaceDetails(props) {
   return (
     <div key={race.id}>
       <Typography variant="headline" color="primary">
-        <Button variant="contained" color="primary">
+        <Button variant="extendedFab" color="primary">
+          <EjectIcon />
           <a
             href={race.resultsUrl}
             target="_blank"

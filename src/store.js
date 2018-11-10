@@ -15,8 +15,14 @@ import rootReducer from './reducers/rootReducer';
 const loggerMiddleware = createLogger();
 
 export default function configureStore(initialState = {}) {
-    return createStore(rootReducer, composeWithDevTools(
-        applyMiddleware(thunkMiddleware, // lets us dispatch() functions
-            loggerMiddleware, // neat middleware that logs actions),
-        )))
+    if (process.env.REACT_APP_DEV_MODE === 'false') {
+        return createStore(rootReducer, 
+            applyMiddleware(thunkMiddleware, // lets us dispatch() functions
+            ));
+    } else {
+        return createStore(rootReducer, composeWithDevTools(
+            applyMiddleware(thunkMiddleware, // lets us dispatch() functions
+            //loggerMiddleware, // neat middleware that logs actions),
+            )));
+    }
 };

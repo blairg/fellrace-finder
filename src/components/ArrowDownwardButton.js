@@ -9,6 +9,7 @@ const styles = theme => ({
     position: 'fixed',
     bottom: '5px',
     left: '1%',
+    zIndex: '1'
   },
 });
 

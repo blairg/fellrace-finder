@@ -73,7 +73,9 @@ const styles = {
 };
 
 function RunnerDetails(props) {
+  // !props.runner ? console.log('RunnerDetails', props.runner): console.log();
   const { classes, runner } = props;
+
   const timeDownwardArrow =
     runner.timeFromFirst !== '' ? <ArrowDownward /> : null;
 

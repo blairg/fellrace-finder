@@ -34,7 +34,7 @@
     "start": "react-app-env start",
     "start:production": "react-app-env --env-file=production.env start",
     "build": "react-app-env --env-file=production.env build",
-    "build:dev": "react-app-env --env-file=production.env build",
+    "build:dev": "react-app-env --env-file=development.env build",
     "test": "react-app-env test",
     "eject": "react-scripts eject",
     "predeploy": "yarn build",
