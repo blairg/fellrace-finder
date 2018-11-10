@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,10 +12,11 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Grid from '@material-ui/core/Grid';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-import PerformanceStats from './PerformanceStats';
-import AveragePerformanceChart from './AveragePerformanceChart';
-import OverallPerformanceChart from './OverallPerformanceChart';
+const PerformanceStats = React.lazy(() => import('./PerformanceStats'));
+const AveragePerformanceChart = React.lazy(() => import('./AveragePerformanceChart'));
+const OverallPerformanceChart = React.lazy(() => import('./OverallPerformanceChart'));
 
 const HeaderTableCell = withStyles(theme => ({
   root: {
@@ -38,7 +39,10 @@ const styles = theme => ({
   expansionPanel: {
     marginTop: '5px',
     marginBottom: '15px',
-  }
+  },
+  progress: {
+    margin: theme.spacing.unit * 2,
+  },
 });
 
 const staticListOfMonths = () => {
@@ -64,21 +68,29 @@ const staticListOfTableCells = () => {
   let listOfMonths = [];
 
   for (let i = 0; i < 12; i++) {
-    listOfMonths.push(<TableCell key={i} numeric>0</TableCell>)
+    listOfMonths.push(
+      <TableCell key={i} numeric>
+        0
+      </TableCell>,
+    );
   }
 
   return listOfMonths;
 };
 
-const buildMonthRows = (racesByYear) => {
+const buildMonthRows = racesByYear => {
   let listOfYears = [];
   let index = 0;
 
-  racesByYear.map((eachYear) => {
+  racesByYear.map(eachYear => {
     const listOfMonths = staticListOfMonths();
     const listOfTableCells = staticListOfTableCells();
     const yearKey = 'year-' + eachYear.year.toString() + '-' + index.toString();
-    const yearCell = <TableCell key={yearKey} numeric>{eachYear.year}</TableCell>;
+    const yearCell = (
+      <TableCell key={yearKey} numeric>
+        {eachYear.year}
+      </TableCell>
+    );
     let totalForYear = 0;
 
     if (eachYear.months && eachYear.months.length > 0) {
@@ -88,16 +100,25 @@ const buildMonthRows = (racesByYear) => {
         const monthIndex = listOfMonths.indexOf(monthName);
 
         if (monthIndex > -1) {
-          const yearMonthKey = 'year-' + eachYear.year.toString() + '-month' + monthName;
+          const yearMonthKey =
+            'year-' + eachYear.year.toString() + '-month' + monthName;
           const monthValue = `${eachMonth[monthName]}`;
 
           totalForYear = totalForYear + parseInt(monthValue, 10);
-          listOfTableCells[monthIndex] = <TableCell key={yearMonthKey} numeric>{monthValue}</TableCell>;
+          listOfTableCells[monthIndex] = (
+            <TableCell key={yearMonthKey} numeric>
+              {monthValue}
+            </TableCell>
+          );
         }
       }
     }
 
-    const totalCell = <TableCell key={`total-${yearKey}`} numeric>{totalForYear}</TableCell>;
+    const totalCell = (
+      <TableCell key={`total-${yearKey}`} numeric>
+        {totalForYear}
+      </TableCell>
+    );
     const rowKey = eachYear.year.toString() + '-' + index.toString();
 
     listOfTableCells.unshift(totalCell);
@@ -116,37 +137,65 @@ function OverallStats(props) {
     <React.Fragment>
       <ExpansionPanel className={classes.expansionPanel}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className={classes.heading}>Show number of races by year and month</Typography>
+          <Typography className={classes.heading}>
+            Show number of races by year and month
+          </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container>
             <Grid item xs={12}>
-              <PerformanceStats overallStats={overallStats} />
+              <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                <PerformanceStats overallStats={overallStats} />
+              </Suspense>
             </Grid>
             <Grid item xs={12}>
               <Paper className={classes.root}>
                 <Table className={classes.table}>
                   <TableHead>
                     <TableRow key={'header'}>
-                      <HeaderTableCell key={'year'}></HeaderTableCell>
-                      <HeaderTableCell key={'total'} numeric>Total</HeaderTableCell>
-                      <HeaderTableCell key={'jan'} numeric>Jan</HeaderTableCell>
-                      <HeaderTableCell key={'feb'} numeric>Feb</HeaderTableCell>
-                      <HeaderTableCell key={'mar'} numeric>Mar</HeaderTableCell>
-                      <HeaderTableCell key={'apr'} numeric>Apr</HeaderTableCell>
-                      <HeaderTableCell key={'may'} numeric>May</HeaderTableCell>
-                      <HeaderTableCell key={'jun'} numeric>Jun</HeaderTableCell>
-                      <HeaderTableCell key={'jul'} numeric>Jul</HeaderTableCell>
-                      <HeaderTableCell key={'aug'} numeric>Aug</HeaderTableCell>
-                      <HeaderTableCell key={'sep'} numeric>Sep</HeaderTableCell>
-                      <HeaderTableCell key={'oct'} numeric>Oct</HeaderTableCell>
-                      <HeaderTableCell key={'nov'} numeric>Nov</HeaderTableCell>
-                      <HeaderTableCell key={'dec'} numeric>Dec</HeaderTableCell>
+                      <HeaderTableCell key={'year'} />
+                      <HeaderTableCell key={'total'} numeric>
+                        Total
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'jan'} numeric>
+                        Jan
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'feb'} numeric>
+                        Feb
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'mar'} numeric>
+                        Mar
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'apr'} numeric>
+                        Apr
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'may'} numeric>
+                        May
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'jun'} numeric>
+                        Jun
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'jul'} numeric>
+                        Jul
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'aug'} numeric>
+                        Aug
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'sep'} numeric>
+                        Sep
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'oct'} numeric>
+                        Oct
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'nov'} numeric>
+                        Nov
+                      </HeaderTableCell>
+                      <HeaderTableCell key={'dec'} numeric>
+                        Dec
+                      </HeaderTableCell>
                     </TableRow>
                   </TableHead>
-                  <TableBody>
-                    {yearsAndMonths}
-                  </TableBody>
+                  <TableBody>{yearsAndMonths}</TableBody>
                 </Table>
               </Paper>
             </Grid>
@@ -155,21 +204,37 @@ function OverallStats(props) {
       </ExpansionPanel>
       <ExpansionPanel className={classes.expansionPanel}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className={classes.heading}>Show performance graphs</Typography>
+          <Typography className={classes.heading}>
+            Show performance graphs
+          </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container>
-              <Grid item xs={12}>
-                <OverallPerformanceChart overallRaceData={overallStats.overallRaceData} />
-              </Grid>
-              <Grid item xs={12}>
-                <AveragePerformanceChart performanceData={overallStats.performanceByMonthData} 
-                                        title={"Average Performance By Month"} xTitle={"Year/Month"} />
-              </Grid>
-              <Grid item xs={12}>                       
-                <AveragePerformanceChart performanceData={overallStats.performanceByYearData} 
-                                        title={"Average Performance By Year"} xTitle={"Year"} />
-              </Grid>
+            <Grid item xs={12}>
+              <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                <OverallPerformanceChart
+                    overallRaceData={overallStats.overallRaceData}
+                  />
+              </Suspense>
+            </Grid>
+            <Grid item xs={12}>
+              <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                <AveragePerformanceChart
+                  performanceData={overallStats.performanceByMonthData}
+                  title={'Average Performance By Month'}
+                  xTitle={'Year/Month'}
+                />
+              </Suspense>
+            </Grid>
+            <Grid item xs={12}>
+            <Suspense fallback={<CircularProgress className={styles.progress} />}>
+                <AveragePerformanceChart
+                    performanceData={overallStats.performanceByYearData}
+                    title={'Average Performance By Year'}
+                    xTitle={'Year'}
+                  />
+              </Suspense>
+            </Grid>
           </Grid>
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -177,4 +242,4 @@ function OverallStats(props) {
   );
 }
 
-export default withStyles(styles)(OverallStats);
+export default withStyles(styles)(React.memo(OverallStats));

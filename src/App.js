@@ -1,12 +1,20 @@
-import React, { PureComponent } from 'react';
-import Search from './components/Search';
-import runnerImage from './runner.png';
+// Polyfills
+import 'intersection-observer';
+
+import React, { PureComponent, Suspense } from 'react';
+import { LazyImage } from 'react-lazy-images';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { purple, green } from '@material-ui/core/colors';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-// Font
+// Font 
 import 'typeface-roboto';
+
+import runnerImage from './images/runner.png';
+import lowResRunnerImage from './images/runnerlowres.jpg';
+
+const Main = React.lazy(() => import('./containers/Main'));
 
 // Styles
 const styles = {
@@ -37,21 +45,44 @@ class App extends PureComponent {
     return (
       <MuiThemeProvider theme={muiTheme}>
         <CssBaseline />
-        <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"></link>
+        <meta name="Description" content="Application which allow to search for a runner and it displays the results for the fell races they have completed."></meta>
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          as="style"
+        />
         <link
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet"
         />
-        <link rel="dns-prefetch" href="//fonts.googleapis.com"></link>
-        <link rel="dns-prefetch" href="//storage.googleapis.com"></link>
-        <link href="//storage.googleapis.com" rel="preconnect" crossOrigin="true"></link>
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//storage.googleapis.com" />
+        <link rel="dns-prefetch" href="//fellrace-finder-server.herokuapp.com" />
+        <link
+          href="//storage.googleapis.com"
+          rel="preconnect"
+          crossOrigin="true"
+        />
+        <link
+          href="//fellrace-finder-server.herokuapp.com"
+          rel="preconnect"
+          crossOrigin="true"
+        />
         <div style={styles.container}>
-        
           <header>
-            <img src={runnerImage} alt="runner" />
+            <LazyImage
+                  src={runnerImage}
+                  alt="stickman runner"
+                  placeholder={({ imageProps, ref }) => (
+                    <img ref={ref} src={lowResRunnerImage} alt={imageProps.alt} />
+                  )}
+                  actual={({ imageProps }) => <img {...imageProps} />}
+                />
           </header>
           <main>
-            <Search />
+          <Suspense fallback={<CircularProgress />}>
+            <Main />
+          </Suspense>
           </main>
         </div>
       </MuiThemeProvider>
