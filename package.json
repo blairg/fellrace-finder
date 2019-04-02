@@ -14,7 +14,7 @@
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
     "parse-ms": "^1.0.1",
-    "react": "^16.4.0",
+    "react": "^16.8.5",
     "react-autosuggest": "^9.3.4",
     "react-chartkick": "^0.3.0",
     "react-dom": "^16.4.0",
