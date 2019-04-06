@@ -1,6 +1,8 @@
 import {
     LOADING_PROGRESS_ACTION,
+    LOADING_PROGRESS_RACE_ACTION,
     CHOSEN_RUNNERS_ACTION,
+    CHOSEN_RACES_ACTION,
     CHOSEN_RACE_ACTION,
     END_INDEX_ACTION,
     LOAD_MORE_PROGRESS_ACTION,
@@ -12,9 +14,17 @@ export default (state = { loadingProgress: false, chosenRunners: [], chosenRace:
                 return Object.assign({}, state, {
                     loadingProgress: action.payload
                 });
+            case LOADING_PROGRESS_RACE_ACTION:
+                return Object.assign({}, state, {
+                    loadingRaceProgress: action.payload
+                });
             case CHOSEN_RUNNERS_ACTION:
                 return Object.assign({}, state, {
                     chosenRunners: action.payload
+                });
+            case CHOSEN_RACES_ACTION:
+                return Object.assign({}, state, {
+                    chosenRaces: action.payload
                 });
             case CHOSEN_RACE_ACTION:
                 return Object.assign({}, state, {
