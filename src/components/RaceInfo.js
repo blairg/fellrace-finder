@@ -296,6 +296,9 @@ function RaceInfo(props) {
                   - {raceInfo._time}
                 </Typography>
                 <Typography variant="subheading">
+                  {raceInfo._type}
+                </Typography>
+                <Typography variant="subheading">
                   {raceInfo._distanceKilometers}
                   km / {raceInfo._climbMeters}m
                 </Typography>
