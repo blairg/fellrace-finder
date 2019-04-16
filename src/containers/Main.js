@@ -6,15 +6,32 @@ import Runner from './Runner';
 import Race from './Race';
 
 import { menuAction, menuToggleAction } from './../actions/menu';
+import { getLocal, setLocal,  } from './../service/storageService';
+
+const cacheKey = 'Main-menuoption';
 
 class Main extends PureComponent {
   constructor(props) {
     super(props);
-  }
+	}
+	
+	componentWillMount() {
+		const cachedValue = getLocal(cacheKey);
+
+		if (cachedValue) {
+			if (cachedValue === 'race') {
+				this.props.dispatchMenuAction({race: true, runner: false});
+			} else {
+				this.props.dispatchMenuAction({race: false, runner: true});
+			}
+
+			this.props.dispatchMenuToggleAction(false);
+		}
+	}
 
 	raceOnClick = async event => {
     event.preventDefault();
-		console.log('race clicked');
+		setLocal({key: cacheKey, value: 'race'});
 
 		this.props.dispatchMenuAction({race: true, runner: false});
 		this.props.dispatchMenuToggleAction(false);
@@ -22,7 +39,7 @@ class Main extends PureComponent {
 
 	runnerOnClick = async event => {
     event.preventDefault();
-		console.log('runner clicked');
+		setLocal({key: cacheKey, value: 'runner'});
 
 		this.props.dispatchMenuAction({race: false, runner: true});
 		this.props.dispatchMenuToggleAction(false);

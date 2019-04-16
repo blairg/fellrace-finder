@@ -83,6 +83,8 @@ class Runner extends PureComponent {
       this.props.dispatchChosenRunners(namesSet);
       this.onChange(namesSet);
     }
+
+    scroll.scrollTo(0);
   };
 
   componentWillUnmount = () => {

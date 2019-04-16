@@ -154,3 +154,20 @@ export function partialRaceSearch(partialName) {
       };
     });
 }
+
+export async function getRaceInfoByNames(raceNames) {
+  const url = `${process.env.REACT_APP_API_SERVER}/race/byNames/${raceNames}`;
+  let races = null;
+
+  await axios
+    .get(url)
+    .then(function(response) {
+      races = response.data;
+      return races;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+
+  return races;
+}

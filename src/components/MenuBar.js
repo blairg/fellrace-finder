@@ -15,8 +15,8 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import GroupIcon from '@material-ui/icons/Group';
-import MapIcon from '@material-ui/icons/Map';
+import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
+import EventNoteIcon from '@material-ui/icons/EventNote';
 
 import { menuToggleAction } from './../actions/menu';
 
@@ -133,21 +133,21 @@ class MenuBar extends React.Component {
           <Divider />
           <List>
             <ListItem button key='Runner' onClick={runnerOnClick}>
-                <ListItemIcon><GroupIcon /></ListItemIcon>
+                <ListItemIcon><DirectionsRunIcon /></ListItemIcon>
                 <ListItemText primary='Runner' />
             </ListItem>
             <ListItem button key='Race' onClick={raceOnClick}>
-                <ListItemIcon><MapIcon /></ListItemIcon>
+                <ListItemIcon><EventNoteIcon /></ListItemIcon>
                 <ListItemText primary='Race' />
             </ListItem>
-            <ListItem button key='Club'>
+            {/* <ListItem button key='Club'>
                 <ListItemIcon><MapIcon /></ListItemIcon>
                 <ListItemText primary='Club' />
             </ListItem>
             <ListItem button key='Calendar'>
                 <ListItemIcon><MapIcon /></ListItemIcon>
                 <ListItemText primary='Calendar' />
-            </ListItem>
+            </ListItem> */}
           </List>
         </Drawer>
       </div>

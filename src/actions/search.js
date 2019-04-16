@@ -28,10 +28,10 @@ export const chosenRunnersAction = (chosenRunners = []) => dispatch => {
     });
 };
 
-export const chosenRacesAction = (chosenRaces = []) => dispatch => {
+export const chosenRacesAction = (chosenRace = []) => dispatch => {
     dispatch({
         type: CHOSEN_RACES_ACTION,
-        payload: chosenRaces,
+        payload: chosenRace,
     });
 };
 
