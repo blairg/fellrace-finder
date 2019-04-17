@@ -4,7 +4,11 @@ import { animateScroll as scroll } from 'react-scroll';
 import { Async } from 'react-select';
 import _ from 'lodash';
 import 'react-select/dist/react-select.css';
-// Material-UI
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -24,6 +28,7 @@ const ArrowDownwardButton = React.lazy(() => import('./../components/ArrowDownwa
 const RaceInfo = React.lazy(() => import('./../components/RaceInfo'));
 const ClearButton = React.lazy(() => import('./../components/ClearButton'));
 const ResultCategory = React.lazy(() => import('./../components/ResultCategory'));
+const YearResultCategory = React.lazy(() => import('./../components/YearResultCategory'));
 
 const styles = theme => ({
   searchField: {
@@ -46,6 +51,10 @@ const styles = theme => ({
   progress: {
     margin: theme.spacing.unit * 2,
   },
+  expansionPanel: {
+    marginTop: '5px',
+    marginBottom: '15px',
+  },
 });
 
 const chosenRacesKey = 'chosenRaces';
@@ -63,8 +72,10 @@ class Race extends PureComponent {
     const racesSet = getLocal(chosenRacesKey);
 
     if (racesSet) {
+      this.props.dispatchLoadingProgress(true);
       this.props.dispatchChosenRace(racesSet);
       this.onChange(racesSet);
+      this.props.dispatchLoadingProgress(false);
     }
 
     scroll.scrollTo(0);
@@ -153,6 +164,7 @@ class Race extends PureComponent {
 
   fetchRaces = async (searchValue, callback) => {
     console.log('searching - ', searchValue);
+    this.props.dispatchLoadingProgress(true);
 
     if (!searchValue) {
       callback(null, { options: [] });
@@ -163,6 +175,7 @@ class Race extends PureComponent {
     } else {
       callback(null, { options: [] });
     }
+    this.props.dispatchLoadingProgress(false);
   };
 
 	debouncedFetchRaces = _.debounce(this.fetchRaces, 200);
@@ -198,9 +211,8 @@ class Race extends PureComponent {
   };
 
   clearClick = () => {
-    console.log('cleared out ');
     this.props.dispatchLoadingProgress(true);
-    // this.props.dispatchSticky(false);
+    this.props.dispatchSticky(false);
     this.props.dispatchRaceDetails(null);
     this.props.dispatchChosenRace(null);
 
@@ -208,7 +220,7 @@ class Race extends PureComponent {
 
     this.props.dispatchLoadingProgress(false);
 
-    // scroll.scrollToTop();
+    scroll.scrollToTop();
   };
 
   buildRaceInfo = raceInfo => {
@@ -227,20 +239,45 @@ class Race extends PureComponent {
     );
   };
 
-  buildResultCategories = categoryRecords => {
+  buildResultCategories = (categoryRecords, classes) => {
     let resultCategoryComponent;
 
     if (categoryRecords) {
-      resultCategoryComponent = <Suspense fallback={<CircularProgress className={styles.progress} />}>
+      resultCategoryComponent = <Suspense fallback={<CircularProgress className={classes.progress} />}>
                   <ResultCategory categoryRecords={categoryRecords} />
                 </Suspense>;
     }
 
     return (
-      <>
-        {resultCategoryComponent}
-      </>
+      <React.Fragment>
+        <ExpansionPanel key={categoryRecords.length} className={classes.expansionPanel}>
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography className={classes.heading}>
+                  Overall
+              </Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              {resultCategoryComponent}
+            </ExpansionPanelDetails>
+        </ExpansionPanel>
+      </React.Fragment>
     );
+  };
+
+  buildYearResultCategories = races => {
+    let yearResultsComponent;
+
+    if (races) {
+      yearResultsComponent = <Suspense fallback={<CircularProgress className={styles.progress} />}>
+        <YearResultCategory races={races} />
+        <br />
+        <br />
+        <br />
+        <br />
+      </Suspense>;
+    }
+
+    return yearResultsComponent;
   };
 
   render() {
@@ -255,6 +292,7 @@ class Race extends PureComponent {
     let resultCategoryComponent;
     let scrollToTopButton;
     let downwardArrowButtonShow;
+    let yearResultsComponent;
 
     // loading race details
     if (loadingRaceProgress) {
@@ -267,13 +305,16 @@ class Race extends PureComponent {
 
     if (raceDetails) {
       raceInfoComponent = this.buildRaceInfo(raceDetails.raceInfo);
-      resultCategoryComponent = this.buildResultCategories(raceDetails.categoryRecords);
+      resultCategoryComponent = this.buildResultCategories(raceDetails.categoryRecords, this.props.classes);
+      yearResultsComponent = this.buildYearResultCategories(raceDetails.races);
 
       downwardArrowButtonShow = (
         <Suspense fallback={<CircularProgress className={progress} />}>
                 <ArrowDownwardButton onClick={this.scrollToBottomClick} />
               </Suspense>
       );
+      
+
     }
 
     if (sticky) {
@@ -308,15 +349,9 @@ class Race extends PureComponent {
         {loadingResults}
         {raceInfoComponent}
         {resultCategoryComponent}
+        {yearResultsComponent}
         {downwardArrowButtonShow}
         {scrollToTopButton}
-        {/*  {downwardArrowButtonShow}
-         {loadingResults}
-         {overallStats}
-         {raceResults}
-         {loadMoreLoadingProgress}
-         {loadMoreButton}
-         {scrollToTopButton} */}
       </React.Fragment>
   	);
  	}

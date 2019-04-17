@@ -19,6 +19,10 @@ const margins = {
 const cardStyles = {
   ...margins,
   height: '140px',
+  ['@media (min-width:375px)']: {
+    // eslint-disable-line no-useless-computed-key
+    height: '230px',
+  },
   ['@media (min-width:400px)']: {
     // eslint-disable-line no-useless-computed-key
     height: '250px',

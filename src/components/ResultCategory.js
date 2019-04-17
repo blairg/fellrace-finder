@@ -12,35 +12,6 @@ const margins = {
     marginBottom: '5px',
   };
   
-  const cardStyles = {
-    ...margins,
-    height: '140px',
-    ['@media (min-width:400px)']: {
-      // eslint-disable-line no-useless-computed-key
-      height: '500px',
-    },
-    ['@media (max-width:400px)']: {
-        // eslint-disable-line no-useless-computed-key
-        height: '500px',
-      },
-    ['@media (min-width:750px)']: {
-      // eslint-disable-line no-useless-computed-key
-      height: '290px',
-    },
-    ['@media (max-width:375px)']: {
-      // eslint-disable-line no-useless-computed-key
-      height: '520px',
-    },
-    ['@media (max-width:350px)']: {
-      // eslint-disable-line no-useless-computed-key
-      height: '900px',
-    },
-    ['@media (max-width:320px)']: {
-      // eslint-disable-line no-useless-computed-key
-      height: '590px',
-    },
-  };
-  
   const boxShadow = '0px 0px 9px #50AE55';
   
   const styles = {
@@ -49,7 +20,7 @@ const margins = {
       ...margins,
     },
     overallCard: {
-      ...cardStyles,
+      ...margins,
       '&:hover': {
         boxShadow,
       },

@@ -1,5 +1,6 @@
 import {
     LOADING_PROGRESS_ACTION,
+    LOADING_PROGRESS_RACE_ACTION,
     CHOSEN_RUNNERS_ACTION,
     CHOSEN_RACES_ACTION,
     CHOSEN_RACE_ACTION,
@@ -16,7 +17,7 @@ export const loadingProgressAction = (loadingProgress = true) => dispatch => {
 
 export const loadingProgressRaceAction = (loadingProgress = true) => dispatch => {
     dispatch({
-        type: LOADING_PROGRESS_ACTION,
+        type: LOADING_PROGRESS_RACE_ACTION,
         payload: loadingProgress,
     });
 };

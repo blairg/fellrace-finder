@@ -370,6 +370,7 @@ class Runner extends PureComponent {
 
   fetchRunners = async (searchValue, callback) => {
     console.log('searching - ', searchValue);
+    this.props.dispatchLoadingProgress(true);
 
     if (!searchValue) {
       callback(null, { options: [] });
@@ -380,6 +381,8 @@ class Runner extends PureComponent {
     } else {
       callback(null, { options: [] });
     }
+
+    this.props.dispatchLoadingProgress(false);
   };
 
   debouncedFetchRunners = _.debounce(this.fetchRunners, 100);

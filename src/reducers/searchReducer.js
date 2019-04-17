@@ -8,7 +8,8 @@ import {
     LOAD_MORE_PROGRESS_ACTION,
 } from '../actionTypes/search';
 
-export default (state = { loadingProgress: false, chosenRunners: [], chosenRace: '', endIndex: 0, loadMoreLoading: false }, action) => {
+export default (state = { loadingProgress: false, loadingRaceProgress: false, chosenRunners: [], 
+                          chosenRace: '', endIndex: 0, loadMoreLoading: false }, action) => {
         switch (action.type) {
             case LOADING_PROGRESS_ACTION:
                 return Object.assign({}, state, {
