@@ -29,6 +29,7 @@ const RaceInfo = React.lazy(() => import('./../components/RaceInfo'));
 const ClearButton = React.lazy(() => import('./../components/ClearButton'));
 const ResultCategory = React.lazy(() => import('./../components/ResultCategory'));
 const YearResultCategory = React.lazy(() => import('./../components/YearResultCategory'));
+const RacePerformancePanel = React.lazy(() => import('./../components/RacePerformancePanel'));
 
 const styles = theme => ({
   searchField: {
@@ -253,7 +254,7 @@ class Race extends PureComponent {
         <ExpansionPanel key={categoryRecords.length} className={classes.expansionPanel}>
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
               <Typography className={classes.heading}>
-                  Overall
+                  <b>Overall</b>
               </Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
@@ -266,7 +267,7 @@ class Race extends PureComponent {
 
   buildYearResultCategories = races => {
     let yearResultsComponent;
-
+ 
     if (races) {
       yearResultsComponent = <Suspense fallback={<CircularProgress className={styles.progress} />}>
         <YearResultCategory races={races} />
@@ -279,6 +280,18 @@ class Race extends PureComponent {
 
     return yearResultsComponent;
   };
+
+  buildYearPerformanceGraph = (races, progressClass) => {
+    const performanceData = races.map((race) => {
+      if (race.performance > 0) {
+        return [`${race.year}`, `${race.performance}%`];
+      }
+    }).filter((race) => race !== undefined);
+
+    return <Suspense fallback={<CircularProgress className={progressClass} />}>
+            <RacePerformancePanel raceData={performanceData} />
+           </Suspense>;
+  }
 
   render() {
     const { progress, searchField, search } = this.props.classes;
@@ -293,6 +306,7 @@ class Race extends PureComponent {
     let scrollToTopButton;
     let downwardArrowButtonShow;
     let yearResultsComponent;
+    let racePerformancePanelComponent;
 
     // loading race details
     if (loadingRaceProgress) {
@@ -307,14 +321,13 @@ class Race extends PureComponent {
       raceInfoComponent = this.buildRaceInfo(raceDetails.raceInfo);
       resultCategoryComponent = this.buildResultCategories(raceDetails.categoryRecords, this.props.classes);
       yearResultsComponent = this.buildYearResultCategories(raceDetails.races);
+      racePerformancePanelComponent = this.buildYearPerformanceGraph(raceDetails.races, progress);
 
       downwardArrowButtonShow = (
         <Suspense fallback={<CircularProgress className={progress} />}>
                 <ArrowDownwardButton onClick={this.scrollToBottomClick} />
               </Suspense>
       );
-      
-
     }
 
     if (sticky) {
@@ -348,6 +361,7 @@ class Race extends PureComponent {
         </div>
         {loadingResults}
         {raceInfoComponent}
+        {racePerformancePanelComponent}
         {resultCategoryComponent}
         {yearResultsComponent}
         {downwardArrowButtonShow}

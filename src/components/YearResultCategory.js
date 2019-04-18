@@ -6,6 +6,7 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Grid from '@material-ui/core/Grid';
 
 const ResultCategory = React.lazy(() => import('./ResultCategory'));
 
@@ -35,6 +36,8 @@ const buildRacePanels = (races, classes) => {
     for (let i = 0; i < races.length; i++) {
         if (races[i].numberOfRunners > 0) {
             const category = races[i].categories;
+            const dnf = races[i].numberOfFinishers > 0 ? `(DNF: ${races[i].numberOfFinishers})` : null;
+        
             const categories = <Suspense fallback={<CircularProgress className={classes.progress} />}>
                 <ResultCategory key={races[i]._id} categoryRecords={category} />
             </Suspense>;
@@ -43,11 +46,18 @@ const buildRacePanels = (races, classes) => {
                 <ExpansionPanel key={races[i].year} className={classes.expansionPanel}>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography className={classes.heading}>
-                        {races[i].year}
+                        <b>{races[i].year}</b>
                     </Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        {categories}
+                        <Grid className={classes.root} container>
+                            <Grid item xs={12}>
+                                <b>Runners: </b>{races[i].numberOfRunners} {dnf}
+                            </Grid>
+                            <Grid item xs={12}>
+                                {categories}
+                            </Grid>
+                        </Grid>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
             );
