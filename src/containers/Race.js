@@ -1,7 +1,10 @@
-import React, { PureComponent, Suspense } from 'react';
+/* global google */
+
+import React, { Component, Suspense } from 'react';
 import { connect } from 'react-redux';
 import { animateScroll as scroll } from 'react-scroll';
 import { Async } from 'react-select';
+import { compose, withProps } from "recompose";
 import _ from 'lodash';
 import 'react-select/dist/react-select.css';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
@@ -23,6 +26,14 @@ import { getSession,
 import LoadingProgress from './../components/LoadingProgress';
 import NoResults from './../components/NoResults';
 
+import {
+  withScriptjs,
+  withGoogleMap,
+  GoogleMap,
+  Polyline
+} from "react-google-maps";
+// import MapComponent from './../components/MapComponent';
+
 const ArrowUpwardButton = React.lazy(() => import('./../components/ArrowUpwardButton'));
 const ArrowDownwardButton = React.lazy(() => import('./../components/ArrowDownwardButton'));
 const RaceInfo = React.lazy(() => import('./../components/RaceInfo'));
@@ -30,6 +41,7 @@ const ClearButton = React.lazy(() => import('./../components/ClearButton'));
 const ResultCategory = React.lazy(() => import('./../components/ResultCategory'));
 const YearResultCategory = React.lazy(() => import('./../components/YearResultCategory'));
 const RacePerformancePanel = React.lazy(() => import('./../components/RacePerformancePanel'));
+const MapComponent = React.lazy(() => import('./../components/MapComponent'));
 
 const styles = theme => ({
   searchField: {
@@ -59,8 +71,9 @@ const styles = theme => ({
 });
 
 const chosenRacesKey = 'chosenRaces';
+const directionsDestinationKey = 'directionsDestinationKey';
 
-class Race extends PureComponent {
+class Race extends Component {
   constructor(props) {
     super(props);
 
@@ -86,13 +99,45 @@ class Race extends PureComponent {
     window.removeEventListener('scroll', this.onScroll, false);
   };
 
-  onScroll = () => {
-    if (window.scrollY >= 165 && !this.props.scrollReducer.sticky) {
-      this.props.dispatchSticky(true);
-    } else if (window.scrollY < 165 && this.props.scrollReducer.sticky) {
-      this.props.dispatchSticky(false);
+  shouldComponentUpdate = (nextProps, nextState) => {
+    if (!_.isEqual(this.props.classes, nextProps.classes)) {
+      return true;
     }
-  };
+
+    if (!_.isEqual(this.props.dispatchChosenRace, nextProps.dispatchChosenRace)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchLoadingProgress, nextProps.dispatchLoadingProgress)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchRaceDetails, nextProps.dispatchRaceDetails)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchSticky, nextProps.dispatchSticky)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.menuReducer, nextProps.menuReducer)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.raceReducer, nextProps.raceReducer)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.scrollReducer, nextProps.scrollReducer)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.searchReducer, nextProps.searchReducer)) {
+      return true;
+    }
+
+    return false;
+  }
 
   buildClearButton = () => {
     return <Suspense fallback={<CircularProgress className={styles.prototypeprogress} />}>
@@ -218,6 +263,7 @@ class Race extends PureComponent {
     this.props.dispatchChosenRace(null);
 
     removeLocal(chosenRacesKey);
+    removeSession(directionsDestinationKey);
 
     this.props.dispatchLoadingProgress(false);
 
@@ -228,6 +274,10 @@ class Race extends PureComponent {
     let raceInfoComponent;
 
     if (raceInfo) {
+      if (raceInfo._latitude > 0) {
+        delete raceInfo._latitude; //not needed at there is google maps directions
+      }
+
       raceInfoComponent = <Suspense fallback={<CircularProgress className={styles.progress} />}>
                   <RaceInfo raceInfo={raceInfo} />
                 </Suspense>;
@@ -293,6 +343,36 @@ class Race extends PureComponent {
            </Suspense>;
   }
 
+  buildDownwardArrow = (progress) => {
+    return (
+      <Suspense fallback={<CircularProgress className={progress} />}>
+              <ArrowDownwardButton onClick={this.scrollToBottomClick} />
+            </Suspense>
+    )
+  };
+
+  buildMapComponent = (raceDetails, destination, progress) => { 
+    const originCacheKey = 'origin';
+    let cachedOrigin = getSession(originCacheKey);
+    let origin;
+
+    if (!cachedOrigin && navigator.geolocation) {
+      const geoSuccess = function(position) {
+        origin = { lat: position.coords.latitude, lng: position.coords.longitude };
+        setSession({ key: originCacheKey, value: JSON.stringify(origin)});
+      };
+      navigator.geolocation.getCurrentPosition(geoSuccess);
+    } else {
+      origin = JSON.parse(cachedOrigin);
+    }
+
+    return <Suspense fallback={<CircularProgress className={progress} />}>
+        <MapComponent destination={destination}
+                      origin={origin}
+         />
+      </Suspense>;
+  };
+
   render() {
     const { progress, searchField, search } = this.props.classes;
     const { loadingRaceProgress, chosenRaces } = this.props.searchReducer;
@@ -307,6 +387,7 @@ class Race extends PureComponent {
     let downwardArrowButtonShow;
     let yearResultsComponent;
     let racePerformancePanelComponent;
+    let mapDirectionComponent;
 
     // loading race details
     if (loadingRaceProgress) {
@@ -322,12 +403,9 @@ class Race extends PureComponent {
       resultCategoryComponent = this.buildResultCategories(raceDetails.categoryRecords, this.props.classes);
       yearResultsComponent = this.buildYearResultCategories(raceDetails.races);
       racePerformancePanelComponent = this.buildYearPerformanceGraph(raceDetails.races, progress);
-
-      downwardArrowButtonShow = (
-        <Suspense fallback={<CircularProgress className={progress} />}>
-                <ArrowDownwardButton onClick={this.scrollToBottomClick} />
-              </Suspense>
-      );
+      const destination = { lat: raceDetails.properties.latitude, lng: raceDetails.properties.longitude };
+      mapDirectionComponent = this.buildMapComponent(raceDetails, destination, progress);
+      downwardArrowButtonShow = this.buildDownwardArrow(progress);
     }
 
     if (sticky) {
@@ -359,6 +437,7 @@ class Race extends PureComponent {
           />
           {clearButton}
         </div>
+        {mapDirectionComponent}
         {loadingResults}
         {raceInfoComponent}
         {racePerformancePanelComponent}
@@ -382,4 +461,4 @@ const mapStateToProps = state => ({
   dispatchSticky: (sticky) => dispatch(stickyAction(sticky)),
  });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Race));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(React.memo(Race)));

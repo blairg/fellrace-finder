@@ -39,11 +39,12 @@ const buildRacePanels = (races, classes) => {
             const dnf = races[i].numberOfFinishers > 0 ? `(DNF: ${races[i].numberOfFinishers})` : null;
         
             const categories = <Suspense fallback={<CircularProgress className={classes.progress} />}>
-                <ResultCategory key={races[i]._id} categoryRecords={category} />
+                <ResultCategory key={races[i].id} categoryRecords={category} />
             </Suspense>;
+            const key = `${races[i].year}${races[i].numberOfRunners}`;
 
             panels.push(
-                <ExpansionPanel key={races[i].year} className={classes.expansionPanel}>
+                <ExpansionPanel key={key} className={classes.expansionPanel}>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography className={classes.heading}>
                         <b>{races[i].year}</b>

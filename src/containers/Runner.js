@@ -1,4 +1,4 @@
-import React, { PureComponent, Suspense } from 'react';
+import React, { Component, Suspense } from 'react';
 import { connect } from 'react-redux';
 import { animateScroll as scroll } from 'react-scroll';
 import { Async } from 'react-select';
@@ -67,7 +67,7 @@ const styles = theme => ({
 const chosenRunnersKey = 'chosenRunners';
 const startIndex = 0;
 
-class Runner extends PureComponent {
+class Runner extends Component {
   constructor(props) {
     super(props);
 
@@ -90,6 +90,62 @@ class Runner extends PureComponent {
   componentWillUnmount = () => {
     window.removeEventListener('scroll', this.onScroll, false);
   };
+
+  shouldComponentUpdate = (nextProps, nextState) => {
+    if (!_.isEqual(this.props.classes, nextProps.classes)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchChosenRace, nextProps.dispatchChosenRace)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchChosenRunners, nextProps.dispatchChosenRunners)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchEndIndex, nextProps.dispatchEndIndex)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchLoadMoreProgress, nextProps.dispatchLoadMoreProgress)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchLoadingProgress, nextProps.dispatchLoadingProgress)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchRunnerDetails, nextProps.dispatchRunnerDetails)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.dispatchSticky, nextProps.dispatchSticky)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.menuReducer, nextProps.menuReducer)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.raceReducer, nextProps.raceReducer)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.runnerReducer, nextProps.runnerReducer)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.scrollReducer, nextProps.scrollReducer)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.searchReducer, nextProps.searchReducer)) {
+      return true;
+    }
+
+    return false;
+  }
 
   buildClearButton = () => {
     return <Suspense fallback={<CircularProgress className={styles.prototypeprogress} />}>
@@ -595,4 +651,4 @@ const mapStateToProps = state => ({
   dispatchLoadMoreProgress: (loadMoreProgress) => dispatch(loadMoreProgressAction(loadMoreProgress)),
  });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Runner));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(React.memo(Runner)));

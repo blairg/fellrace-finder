@@ -36,7 +36,7 @@ function RacePerformancePanel(props) {
 
   return (
     <React.Fragment>
-      <ExpansionPanel className={classes.expansionPanel} expanded={true}>
+      <ExpansionPanel className={classes.expansionPanel}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography className={classes.heading}>
             <b>Year Performance Graph</b>
