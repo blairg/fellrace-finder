@@ -35,7 +35,7 @@ const styles = theme => ({
     },
     tableRoot: {
       width: '100%',
-      marginTop: theme.spacing.unit * 3,
+      marginTop: theme.spacing.unit * 2,
       overflowX: 'auto',
     },
     table: {
@@ -142,6 +142,10 @@ const MyMapComponent = compose(
                   </TableBody>
                 </Table>
               </Paper>
+              <br />
+              <br />
+              <br />
+              <br />
           </ExpansionPanelDetails>
       </ExpansionPanel>
   </>

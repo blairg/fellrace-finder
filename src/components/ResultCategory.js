@@ -4,6 +4,12 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
 
 const margins = {
     marginRight: '10px',
@@ -28,6 +34,37 @@ const margins = {
   };
 
 const buildRecords = (categories, classes) => {
+
+    // let categoryCollection = [];
+    // let recordCollection = [];
+
+    // for (let i = 0; i < categories.length; i++) {
+    //     const eachCategory = categories[i];
+    //     recordCollection = [];
+
+    //     for (let j = 0; j < eachCategory._records.length; j++) {
+    //         const eachRecord = eachCategory._records[j];
+    //         const key = `${eachRecord._runnerName}${eachRecord._time}${eachRecord._year}`;
+
+    //         recordCollection.push(
+    //             <Typography key={key} variant="subheading">
+    //                 <b>{j + 1}.</b> {eachRecord._runnerName} ({eachRecord._club}) - {eachRecord._time} ({eachRecord._year})
+    //             </Typography>
+    //         );
+    //     }
+
+    //     categoryCollection.push(
+    //         <Card key={eachCategory._name} className={classes.overallCard}>
+    //             <CardContent>
+    //                 <Typography variant="subheading">
+    //                     <b>Category:</b> {eachCategory._name}
+    //                 </Typography>
+    //                 {recordCollection}
+    //             </CardContent>
+    //         </Card>
+    //     );
+    // }
+
     let categoryCollection = [];
     let recordCollection = [];
 
@@ -40,19 +77,27 @@ const buildRecords = (categories, classes) => {
             const key = `${eachRecord._runnerName}${eachRecord._time}${eachRecord._year}`;
 
             recordCollection.push(
-                <Typography key={key} variant="subheading">
-                    <b>{j + 1}.</b> {eachRecord._runnerName} ({eachRecord._club}) - {eachRecord._time} ({eachRecord._year})
-                </Typography>
+                <TableRow key={key}>
+                  <TableCell align="left"><b>{j + 1}.</b> {eachRecord._runnerName} ({eachRecord._club}) - {eachRecord._time} ({eachRecord._year})</TableCell>
+                </TableRow>
             );
         }
 
         categoryCollection.push(
             <Card key={eachCategory._name} className={classes.overallCard}>
                 <CardContent>
-                    <Typography variant="subheading">
-                        <b>Category:</b> {eachCategory._name}
-                    </Typography>
-                    {recordCollection}
+                    <Paper className={classes.tableRoot}>
+                      <Table className={classes.table}>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell align="right"><b>Category:</b> {eachCategory._name}</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {recordCollection}
+                        </TableBody>
+                      </Table>
+                    </Paper>
                 </CardContent>
             </Card>
         );

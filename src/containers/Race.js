@@ -4,7 +4,6 @@ import React, { Component, Suspense } from 'react';
 import { connect } from 'react-redux';
 import { animateScroll as scroll } from 'react-scroll';
 import { Async } from 'react-select';
-import { compose, withProps } from "recompose";
 import _ from 'lodash';
 import 'react-select/dist/react-select.css';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
@@ -25,14 +24,6 @@ import { getSession,
 
 import LoadingProgress from './../components/LoadingProgress';
 import NoResults from './../components/NoResults';
-
-import {
-  withScriptjs,
-  withGoogleMap,
-  GoogleMap,
-  Polyline
-} from "react-google-maps";
-// import MapComponent from './../components/MapComponent';
 
 const ArrowUpwardButton = React.lazy(() => import('./../components/ArrowUpwardButton'));
 const ArrowDownwardButton = React.lazy(() => import('./../components/ArrowDownwardButton'));
