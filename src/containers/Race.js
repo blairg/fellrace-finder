@@ -33,6 +33,7 @@ const ResultCategory = React.lazy(() => import('./../components/ResultCategory')
 const YearResultCategory = React.lazy(() => import('./../components/YearResultCategory'));
 const RacePerformancePanel = React.lazy(() => import('./../components/RacePerformancePanel'));
 const MapComponent = React.lazy(() => import('./../components/MapComponent'));
+const SameDayRaces = React.lazy(() => import('./../components/SameDayRaces'));
 
 const styles = theme => ({
   searchField: {
@@ -364,6 +365,17 @@ class Race extends Component {
       </Suspense>;
   };
 
+  buildSameDayRaces = (races, progress) => { 
+    if (!races || races.length === 0) {
+      return null;
+    }
+
+    return <Suspense fallback={<CircularProgress className={progress} />}>
+        <SameDayRaces races={races} />
+      </Suspense>;
+  };
+
+
   render() {
     const { progress, searchField, search } = this.props.classes;
     const { loadingRaceProgress, chosenRaces } = this.props.searchReducer;
@@ -379,6 +391,7 @@ class Race extends Component {
     let yearResultsComponent;
     let racePerformancePanelComponent;
     let mapDirectionComponent;
+    let sameDayRacesComponent;
 
     // loading race details
     if (loadingRaceProgress) {
@@ -397,6 +410,7 @@ class Race extends Component {
       const destination = { lat: raceDetails.properties.latitude, lng: raceDetails.properties.longitude };
       mapDirectionComponent = this.buildMapComponent(raceDetails, destination, progress);
       downwardArrowButtonShow = this.buildDownwardArrow(progress);
+      sameDayRacesComponent = this.buildSameDayRaces(raceDetails.racesSameDay, progress);
     }
 
     if (sticky) {
@@ -431,6 +445,7 @@ class Race extends Component {
         {mapDirectionComponent}
         {loadingResults}
         {raceInfoComponent}
+        {sameDayRacesComponent}
         {racePerformancePanelComponent}
         {resultCategoryComponent}
         {yearResultsComponent}

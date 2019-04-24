@@ -34,37 +34,6 @@ const margins = {
   };
 
 const buildRecords = (categories, classes) => {
-
-    // let categoryCollection = [];
-    // let recordCollection = [];
-
-    // for (let i = 0; i < categories.length; i++) {
-    //     const eachCategory = categories[i];
-    //     recordCollection = [];
-
-    //     for (let j = 0; j < eachCategory._records.length; j++) {
-    //         const eachRecord = eachCategory._records[j];
-    //         const key = `${eachRecord._runnerName}${eachRecord._time}${eachRecord._year}`;
-
-    //         recordCollection.push(
-    //             <Typography key={key} variant="subheading">
-    //                 <b>{j + 1}.</b> {eachRecord._runnerName} ({eachRecord._club}) - {eachRecord._time} ({eachRecord._year})
-    //             </Typography>
-    //         );
-    //     }
-
-    //     categoryCollection.push(
-    //         <Card key={eachCategory._name} className={classes.overallCard}>
-    //             <CardContent>
-    //                 <Typography variant="subheading">
-    //                     <b>Category:</b> {eachCategory._name}
-    //                 </Typography>
-    //                 {recordCollection}
-    //             </CardContent>
-    //         </Card>
-    //     );
-    // }
-
     let categoryCollection = [];
     let recordCollection = [];
 
