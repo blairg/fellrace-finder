@@ -1,6 +1,8 @@
 /* global google */
 
 import React from 'react';
+import { compose, withProps, lifecycle } from "recompose";
+import { withScriptjs, withGoogleMap, GoogleMap, DirectionsRenderer } from "react-google-maps";
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -12,10 +14,10 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { compose, withProps, lifecycle } from "recompose";
-import { withScriptjs, withGoogleMap, GoogleMap, DirectionsRenderer } from "react-google-maps";
-import smallLoaderGif from './../images/small-loader.gif';
+import DirectionsCar from '@material-ui/icons/DirectionsCar';
+import EventNoteIcon from '@material-ui/icons/EventNote';
 
+import smallLoaderGif from './../images/small-loader.gif';
 import { getSession, setSession } from './../service/storageService';
 
 const margins = {
@@ -44,7 +46,12 @@ const styles = theme => ({
     overflowX: 'auto',
   },
   table: {
+    marginLeft: theme.spacing.unit * 2,
     minWidth: 500,
+  },
+  directionsCell: {
+    position: 'relative',
+    top: '-15px',
   },
   progress: {
     margin: theme.spacing.unit * 2,
@@ -70,6 +77,15 @@ const getOrigin = () => {
 }
 
 const createMarkup = (html) => { return {__html: html}; };
+
+const buildMapsUrl = (origin, venue) => {
+  const postcodeRegex = /(\b[A-Z]{1,2}\d{1,2}( ?\d?[A-Z]{2})?)(?=,|$)/;
+  const matches = venue.match(postcodeRegex);
+  const googleUrl = `https://www.google.com/maps/dir/${origin.lat},${origin.lng}/${
+                      matches && matches.length > 0 ? matches[0].replace(/ /g, '+') : venue.replace(/ /g, '+')}/@${origin.lat},${origin.lng},10z`;
+
+  return googleUrl;
+};
 
 const DrivingDistance = compose(
   withProps({
@@ -100,16 +116,15 @@ const DrivingDistance = compose(
     }
   })
 )((props) => {
-    const googleUrl = `https://www.google.com/maps/dir/${props.origin.lat},${props.origin.lng}/${props.venue}/@${props.origin.lat},${props.origin.lng},7z`;
     const duration = props.directions ? props.directions.routes[0].legs[0].duration.text : '';
+    const googleUrl = buildMapsUrl(props.origin, props.venue);
     const anchorTag = `<a href=${googleUrl} target='_blank'>${duration}</a>`;
     
     return props.directions && props.directions.routes[0] && props.directions.routes[0].legs[0] ? 
-          <span dangerouslySetInnerHTML={createMarkup(anchorTag)} /> : 
+      <div className={props.classes.directionsCell}><DirectionsCar size={'small'} /><span dangerouslySetInnerHTML={createMarkup(anchorTag)} /></div> : 
           <img src={smallLoaderGif} alt={'loading gif'} />;
   }
 );
-
 
 function SameDayRaces(props) {
   const { classes, races } = props;
@@ -118,12 +133,15 @@ function SameDayRaces(props) {
 
   for (let i = 0; i < races.length; i++) {
     const raceUrl = `https://www.fellrunner.org.uk/races.php?id=${races[i].id}`;
+    const googleUrl = buildMapsUrl(origin, races[i].venue);
+    const anchorTag = `<a href=${googleUrl} target='_blank'>Get Directions</a>`;
+
     const directionsComponent = origin && races[i].location && races[i].location.lat > 0 ? 
-      <DrivingDistance origin={origin} destination={races[i].location} venue={races[i].venue} progress={classes.progress} /> : 
-      null; 
+      <DrivingDistance origin={origin} destination={races[i].location} venue={races[i].venue} classes={classes} /> : 
+      <div><DirectionsCar size={'small'} /><span dangerouslySetInnerHTML={createMarkup(anchorTag)} /></div>; 
 
     sameDayRaces.push(<TableRow key={races[i].id}>
-        <TableCell align="right"><a href={raceUrl} target="_blank">{races[i].name}</a></TableCell>
+        <TableCell align="right"><EventNoteIcon /><a href={raceUrl} target="_blank">{races[i].name}</a></TableCell>
         <TableCell align="right">{races[i].time}</TableCell>
         <TableCell align="right">{races[i].raceType}</TableCell>
         <TableCell align="right">{directionsComponent}</TableCell>

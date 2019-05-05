@@ -64,6 +64,7 @@ const styles = theme => ({
 
 const chosenRacesKey = 'chosenRaces';
 const directionsDestinationKey = 'directionsDestinationKey';
+const originKey = 'origin';
 
 class Race extends Component {
   constructor(props) {
@@ -343,15 +344,14 @@ class Race extends Component {
     )
   };
 
-  buildMapComponent = (raceDetails, destination, progress) => { 
-    const originCacheKey = 'origin';
-    let cachedOrigin = getSession(originCacheKey);
+  buildMapComponent = (destination, progress) => { 
+    let cachedOrigin = getSession(originKey);
     let origin;
 
     if (!cachedOrigin && navigator.geolocation) {
       const geoSuccess = function(position) {
         origin = { lat: position.coords.latitude, lng: position.coords.longitude };
-        setSession({ key: originCacheKey, value: JSON.stringify(origin)});
+        setSession({ key: originKey, value: JSON.stringify(origin)});
       };
       navigator.geolocation.getCurrentPosition(geoSuccess);
     } else {
@@ -408,7 +408,7 @@ class Race extends Component {
       yearResultsComponent = this.buildYearResultCategories(raceDetails.races);
       racePerformancePanelComponent = this.buildYearPerformanceGraph(raceDetails.races, progress);
       const destination = { lat: raceDetails.properties.latitude, lng: raceDetails.properties.longitude };
-      mapDirectionComponent = this.buildMapComponent(raceDetails, destination, progress);
+      mapDirectionComponent = this.buildMapComponent(destination, progress);
       downwardArrowButtonShow = this.buildDownwardArrow(progress);
       sameDayRacesComponent = this.buildSameDayRaces(raceDetails.racesSameDay, progress);
     }
