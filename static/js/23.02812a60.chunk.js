@@ -1,2 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[23],{1664:function(e,a,t){"use strict";t.r(a);var n=t(0),r=t.n(n),c=t(25),l=t(301),o=t(290),i=t.n(o);l.c.addAdapter(i.a);a.default=Object(c.withStyles)(function(e){return{}})(r.a.memo(function(e){var a=e.overallRaceData;return r.a.createElement(r.a.Fragment,null,r.a.createElement(l.a,{download:!0,suffix:"%",title:"Overall Performance",colors:["#9B2FAE","#666"],data:a,xtitle:"Race Date",ytitle:"Performance"}))}))}}]);
-//# sourceMappingURL=23.02812a60.chunk.js.map
