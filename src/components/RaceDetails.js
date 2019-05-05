@@ -34,5 +34,4 @@ function RaceDetails(props) {
   );
 }
 
-// @TODO: Can parse all races and get info like elevation, location, hyperlink for race.
 export default withStyles(styles)(React.memo(RaceDetails));

@@ -20,7 +20,7 @@ const Main = React.lazy(() => import('./containers/Main'));
 const styles = {
   container: {
     textAlign: 'center',
-    marginTop: '-30px',
+    marginTop: '20px',
     backgroundColor: 'white',
   },
 };

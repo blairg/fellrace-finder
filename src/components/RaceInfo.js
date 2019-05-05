@@ -19,6 +19,10 @@ const margins = {
 const cardStyles = {
   ...margins,
   height: '140px',
+  ['@media (min-width:375px)']: {
+    // eslint-disable-line no-useless-computed-key
+    height: '230px',
+  },
   ['@media (min-width:400px)']: {
     // eslint-disable-line no-useless-computed-key
     height: '250px',
@@ -50,19 +54,27 @@ const raceInfoCardStyles = {
   },
   ['@media (min-width:750px)']: {
     // eslint-disable-line no-useless-computed-key
-    height: '130px',
+    height: '150px',
+  },
+  ['@media (max-width:400px)']: {
+    // eslint-disable-line no-useless-computed-key
+    height: '160px',
   },
   ['@media (max-width:375px)']: {
     // eslint-disable-line no-useless-computed-key
-    height: '150px',
+    height: '160px',
   },
   ['@media (max-width:350px)']: {
     // eslint-disable-line no-useless-computed-key
-    height: '220px',
+    height: '160px',
   },
   ['@media (max-width:320px)']: {
     // eslint-disable-line no-useless-computed-key
-    height: '145px',
+    height: '170px',
+  },
+  ['@media (max-width:200px)']: {
+    // eslint-disable-line no-useless-computed-key
+    height: '230px',
   },
 };
 
@@ -294,6 +306,9 @@ function RaceInfo(props) {
                     .format('dddd Do MMMM YYYY')
                     .toString()}{' '}
                   - {raceInfo._time}
+                </Typography>
+                <Typography variant="subheading">
+                  {raceInfo._type}
                 </Typography>
                 <Typography variant="subheading">
                   {raceInfo._distanceKilometers}

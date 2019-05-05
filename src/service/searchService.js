@@ -100,3 +100,74 @@ export function partialSearch(partialName) {
       };
     });
 }
+
+export function partialRaceSearch(partialName) {
+  const cacheKey = `raceSearch${partialName}`;
+  const racesInSessionStorage = getSession(cacheKey);
+
+  if (racesInSessionStorage) {
+    return {
+      options: racesInSessionStorage,
+    };
+  }
+
+  const url = `${
+    process.env.REACT_APP_API_SERVER
+  }/autocomplete/race/${partialName.toLowerCase()}`;
+
+  return fetch(url)
+    .then(response => {
+      return response.json();
+    })
+    .then(json => {
+      const raceList = [];
+
+      console.log(json);
+
+      json.map(race => {
+        let found = false;
+
+        raceList.map(raceAdded => {
+          if (race.display === raceAdded.display) {
+            found = true;
+
+            return true;
+          }
+
+          return false;
+        });
+
+        if (!found) {
+          raceList.push(race);
+        }
+
+        return found;
+      });
+
+      setSession({
+        key: cacheKey,
+        value: raceList,
+      });
+
+      return {
+        options: raceList,
+      };
+    });
+}
+
+export async function getRaceInfoByNames(raceNames) {
+  const url = `${process.env.REACT_APP_API_SERVER}/race/byNames/${raceNames}`;
+  let races = null;
+
+  await axios
+    .get(url)
+    .then(function(response) {
+      races = response.data;
+      return races;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+
+  return races;
+}
