@@ -365,13 +365,16 @@ class Race extends Component {
       </Suspense>;
   };
 
-  buildSameDayRaces = (races, progress) => { 
-    if (!races || races.length === 0) {
+  buildSameDayRaces = (races, sameDayRaces, progress) => { 
+    const yearOfFirstRace = parseInt(races[0].date.substring(6, 10));
+    const yearNow = new Date().getFullYear();
+
+    if (yearOfFirstRace < yearNow || !sameDayRaces || sameDayRaces.length === 0) {
       return null;
     }
 
     return <Suspense fallback={<CircularProgress className={progress} />}>
-        <SameDayRaces races={races} />
+        <SameDayRaces races={sameDayRaces} />
       </Suspense>;
   };
 
@@ -410,7 +413,7 @@ class Race extends Component {
       const destination = { lat: raceDetails.properties.latitude, lng: raceDetails.properties.longitude };
       mapDirectionComponent = this.buildMapComponent(destination, progress);
       downwardArrowButtonShow = this.buildDownwardArrow(progress);
-      sameDayRacesComponent = this.buildSameDayRaces(raceDetails.racesSameDay, progress);
+      sameDayRacesComponent = this.buildSameDayRaces(raceDetails.races, raceDetails.racesSameDay, progress);
     }
 
     if (sticky) {

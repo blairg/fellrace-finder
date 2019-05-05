@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { compose, withProps, lifecycle } from "recompose";
-import { withScriptjs, withGoogleMap, GoogleMap, DirectionsRenderer } from "react-google-maps";
+import { withScriptjs, withGoogleMap } from "react-google-maps";
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
