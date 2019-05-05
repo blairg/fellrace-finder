@@ -11,9 +11,9 @@ import Grid from '@material-ui/core/Grid';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { compose, withProps, lifecycle } from "recompose";
 import { withScriptjs, withGoogleMap, GoogleMap, DirectionsRenderer } from "react-google-maps";
 
@@ -155,7 +155,7 @@ function MapComponent(props) {
   const { origin, destination, classes } = props;
 
   if (!origin) {
-    return <></>;
+    return <CircularProgress />;
   }
 
   return (<ExpansionPanel key='nav-map' className={classes.expansionPanel}>

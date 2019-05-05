@@ -442,9 +442,9 @@ class Race extends Component {
           />
           {clearButton}
         </div>
-        {mapDirectionComponent}
         {loadingResults}
         {raceInfoComponent}
+        {mapDirectionComponent}
         {sameDayRacesComponent}
         {racePerformancePanelComponent}
         {resultCategoryComponent}
