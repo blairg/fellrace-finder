@@ -16,7 +16,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { partialRaceSearch, getRaceInfoByNames } from './../service/searchService';
 import { loadingProgressRaceAction, chosenRacesAction, } from './../actions/search';
-import { raceDetailsAction, } from './../actions/race';
+import { raceDetailsAction, userOriginAction, } from './../actions/race';
 import { stickyAction } from './../actions/scroll';
 import { getSession,
   setSession,
@@ -73,6 +73,25 @@ class Race extends Component {
 		this.searchRaceRef = React.createRef();
   }
 
+  getOrigin = () => {
+    let cachedOrigin = getSession(originKey);
+    let origin;
+
+    if (!cachedOrigin && navigator.geolocation) {
+      var self = this;
+
+      const geoSuccess = function(position) {
+        origin = { lat: position.coords.latitude, lng: position.coords.longitude };
+        setSession({ key: originKey, value: JSON.stringify(origin)});
+        self.props.dispatchOrigin(origin);
+      };
+      navigator.geolocation.getCurrentPosition(geoSuccess);
+    } else {
+      origin = JSON.parse(cachedOrigin);
+      this.props.dispatchOrigin(origin);
+    }
+  }
+
   componentDidMount = () => {
     window.addEventListener('scroll', this.onScroll, false);
 
@@ -85,6 +104,7 @@ class Race extends Component {
       this.props.dispatchLoadingProgress(false);
     }
 
+    this.getOrigin();
     scroll.scrollTo(0);
   };
 
@@ -344,20 +364,7 @@ class Race extends Component {
     )
   };
 
-  buildMapComponent = (destination, progress) => { 
-    let cachedOrigin = getSession(originKey);
-    let origin;
-
-    if (!cachedOrigin && navigator.geolocation) {
-      const geoSuccess = function(position) {
-        origin = { lat: position.coords.latitude, lng: position.coords.longitude };
-        setSession({ key: originKey, value: JSON.stringify(origin)});
-      };
-      navigator.geolocation.getCurrentPosition(geoSuccess);
-    } else {
-      origin = JSON.parse(cachedOrigin);
-    }
-
+  buildMapComponent = (origin, destination, progress) => { 
     return <Suspense fallback={<CircularProgress className={progress} />}>
         <MapComponent destination={destination}
                       origin={origin}
@@ -365,7 +372,7 @@ class Race extends Component {
       </Suspense>;
   };
 
-  buildSameDayRaces = (races, sameDayRaces, progress) => { 
+  buildSameDayRaces = (origin, races, sameDayRaces, progress) => { 
     const yearOfFirstRace = parseInt(races[0].date.substring(6, 10));
     const yearNow = new Date().getFullYear();
 
@@ -374,7 +381,7 @@ class Race extends Component {
     }
 
     return <Suspense fallback={<CircularProgress className={progress} />}>
-        <SameDayRaces races={sameDayRaces} />
+        <SameDayRaces origin={origin} races={sameDayRaces} />
       </Suspense>;
   };
 
@@ -382,7 +389,7 @@ class Race extends Component {
   render() {
     const { progress, searchField, search } = this.props.classes;
     const { loadingRaceProgress, chosenRaces } = this.props.searchReducer;
-    const { raceDetails } = this.props.raceReducer;
+    const { raceDetails, origin, } = this.props.raceReducer;
     const { sticky } = this.props.scrollReducer;
     const searchClass = sticky ? search : '';
     let clearButton;
@@ -411,9 +418,9 @@ class Race extends Component {
       yearResultsComponent = this.buildYearResultCategories(raceDetails.races);
       racePerformancePanelComponent = this.buildYearPerformanceGraph(raceDetails.races, progress);
       const destination = { lat: raceDetails.properties.latitude, lng: raceDetails.properties.longitude };
-      mapDirectionComponent = this.buildMapComponent(destination, progress);
       downwardArrowButtonShow = this.buildDownwardArrow(progress);
-      sameDayRacesComponent = this.buildSameDayRaces(raceDetails.races, raceDetails.racesSameDay, progress);
+      mapDirectionComponent = this.buildMapComponent(origin, destination, progress);
+      sameDayRacesComponent = this.buildSameDayRaces(origin, raceDetails.races, raceDetails.racesSameDay, progress);
     }
 
     if (sticky) {
@@ -468,6 +475,7 @@ const mapStateToProps = state => ({
   dispatchChosenRace: (chosenRace) => dispatch(chosenRacesAction(chosenRace)),
   dispatchRaceDetails: (raceDetails) => dispatch(raceDetailsAction(raceDetails)),
   dispatchSticky: (sticky) => dispatch(stickyAction(sticky)),
+  dispatchOrigin: (origin) => dispatch(userOriginAction(origin)),
  });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(React.memo(Race)));

@@ -58,23 +58,23 @@ const styles = theme => ({
   },
 });
 
-const getOrigin = () => {
-  const originCacheKey = 'origin';
-  let cachedOrigin = getSession(originCacheKey);
-  let origin;
+// const getOrigin = () => {
+//   const originCacheKey = 'origin';
+//   let cachedOrigin = getSession(originCacheKey);
+//   let origin;
 
-  if (!cachedOrigin && navigator.geolocation) {
-    const geoSuccess = function(position) {
-      origin = { lat: position.coords.latitude, lng: position.coords.longitude };
-      setSession({ key: originCacheKey, value: JSON.stringify(origin)});
-    };
-    navigator.geolocation.getCurrentPosition(geoSuccess);
-  } else {
-    origin = JSON.parse(cachedOrigin);
-  }
+//   if (!cachedOrigin && navigator.geolocation) {
+//     const geoSuccess = function(position) {
+//       origin = { lat: position.coords.latitude, lng: position.coords.longitude };
+//       setSession({ key: originCacheKey, value: JSON.stringify(origin)});
+//     };
+//     navigator.geolocation.getCurrentPosition(geoSuccess);
+//   } else {
+//     origin = JSON.parse(cachedOrigin);
+//   }
   
-  return origin;
-}
+//   return origin;
+// }
 
 const createMarkup = (html) => { return {__html: html}; };
 
@@ -127,8 +127,7 @@ const DrivingDistance = compose(
 );
 
 function SameDayRaces(props) {
-  const { classes, races } = props;
-  const origin = getOrigin();
+  const { classes, origin, races } = props;
   let sameDayRaces = [];
 
   for (let i = 0; i < races.length; i++) {
