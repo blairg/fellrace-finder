@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import MenuBar from './../components/MenuBar';
 import Runner from './Runner';
 import Race from './Race';
+import RaceCalendar from './../components/RaceCalendar';
 
 import { menuAction, menuToggleAction } from './../actions/menu';
 import { getLocal, setLocal,  } from './../service/storageService';
@@ -20,9 +21,15 @@ class Main extends PureComponent {
 
 		if (cachedValue) {
 			if (cachedValue === 'race') {
-				this.props.dispatchMenuAction({race: true, runner: false});
-			} else {
-				this.props.dispatchMenuAction({race: false, runner: true});
+				this.props.dispatchMenuAction({race: true, runner: false, calendar: false});
+			}
+
+			if (cachedValue === 'runner') {
+				this.props.dispatchMenuAction({race: false, runner: true, calendar: false});
+			}
+
+			if (cachedValue === 'calendar') {
+				this.props.dispatchMenuAction({race: false, runner: false, calendar: true});
 			}
 
 			this.props.dispatchMenuToggleAction(false);
@@ -33,7 +40,7 @@ class Main extends PureComponent {
     event.preventDefault();
 		setLocal({key: cacheKey, value: 'race'});
 
-		this.props.dispatchMenuAction({race: true, runner: false});
+		this.props.dispatchMenuAction({race: true, runner: false, calendar: false});
 		this.props.dispatchMenuToggleAction(false);
   };
 
@@ -41,30 +48,44 @@ class Main extends PureComponent {
     event.preventDefault();
 		setLocal({key: cacheKey, value: 'runner'});
 
-		this.props.dispatchMenuAction({race: false, runner: true});
+		this.props.dispatchMenuAction({race: false, runner: true, calendar: false});
+		this.props.dispatchMenuToggleAction(false);
+	};
+	
+	calendarOnClick = async event => {
+    event.preventDefault();
+		setLocal({key: cacheKey, value: 'calendar'});
+
+		this.props.dispatchMenuAction({race: false, runner: false, calendar: true});
 		this.props.dispatchMenuToggleAction(false);
   };
 
   render() {
-		const { race, runner } = this.props.menuReducer;
-		let runnerOrRaceSearch;
+		const { race, runner, calendar } = this.props.menuReducer;
+		let menuOption;
 		let hasUserSelectedMenuOption = false;
 
-		if (!race) {
-			runnerOrRaceSearch = <Runner />;
-		} else {
-			runnerOrRaceSearch = <Race />;
+		if (!race && !calendar && runner) {
+			menuOption = <Runner />;
+		} 
+		
+		if (race && !calendar && !runner) {
+			menuOption = <Race />;
 		}
 
-		if (race || runner) {
+		if (!race && calendar && !runner) {
+			menuOption = <RaceCalendar />;
+		}
+
+		if (race || runner || calendar) {
 			hasUserSelectedMenuOption = true;
 		}
 
     return (
       <React.Fragment>
 				<MenuBar raceOnClick={this.raceOnClick} runnerOnClick={this.runnerOnClick} 
-								 closeMenu={hasUserSelectedMenuOption} />
-				{runnerOrRaceSearch}
+				         calendarOnClick={this.calendarOnClick} closeMenu={hasUserSelectedMenuOption} />
+				{menuOption}
       </React.Fragment>
   	);
  	}
