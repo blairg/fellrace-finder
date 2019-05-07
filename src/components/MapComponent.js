@@ -86,7 +86,7 @@ const MyMapComponent = compose(
             directions: result,
           });
         } else {
-          console.error(`error fetching directions ${result}`);
+          console.log(`error fetching directions ${result}`);
         }
       });
     }
