@@ -111,6 +111,9 @@ const DrivingDistance = compose(
           });
         } else {
           console.log(`error fetching directions ${result}`);
+          this.setState({
+            directions: null,
+          });
         }
       });
     }
@@ -119,8 +122,12 @@ const DrivingDistance = compose(
     const duration = props.directions ? props.directions.routes[0].legs[0].duration.text : '';
     const googleUrl = buildMapsUrl(props.origin, props.venue);
     const anchorTag = `<a href=${googleUrl} target='_blank'>${duration}</a>`;
+
+    if (!props.directions) {
+      return null;
+    }
     
-    return props.directions && props.directions.routes[0] && props.directions.routes[0].legs[0] ? 
+    return props.directions.routes[0] && props.directions.routes[0].legs[0] ? 
       <div className={props.classes.directionsCell}><DirectionsCar size={'small'} /><span dangerouslySetInnerHTML={createMarkup(anchorTag)} /></div> : 
           <img src={smallLoaderGif} alt={'loading gif'} />;
   }

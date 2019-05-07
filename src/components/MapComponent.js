@@ -85,8 +85,12 @@ const MyMapComponent = compose(
           this.setState({
             directions: result,
           });
-        } else {
+        } 
+        else {
           console.log(`error fetching directions ${result}`);
+          this.setState({
+            directions: null,
+          });
         }
       });
     }
