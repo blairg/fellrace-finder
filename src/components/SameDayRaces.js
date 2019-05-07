@@ -124,7 +124,7 @@ const DrivingDistance = compose(
     const anchorTag = `<a href=${googleUrl} target='_blank'>${duration}</a>`;
 
     if (!props.directions) {
-      return null;
+      return <div></div>;
     }
     
     return props.directions.routes[0] && props.directions.routes[0].legs[0] ? 
