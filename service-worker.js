@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/fellrace-finder/precache-manifest.fe91014c05c5549b9c28fc6d703e23e2.js"
+  "/fellrace-finder/precache-manifest.ee02848acad2f4d99909ed0b62a2eee5.js"
 );
 
 self.addEventListener('message', (event) => {
