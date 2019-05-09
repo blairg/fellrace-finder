@@ -87,7 +87,7 @@ const MyMapComponent = compose(
           });
         } 
         else {
-          console.log(`error fetching directions ${result}`);
+          //console.log(`error fetching directions ${result}`);
           this.setState({
             directions: null,
           });
@@ -95,8 +95,14 @@ const MyMapComponent = compose(
       });
     }
   })
-)((props) =>
-  <>
+)((props) =>  
+
+{
+  if (!props.directions) {
+    return null;
+  }
+
+  return <>
       <GoogleMap
           defaultZoom={8}
           defaultCenter={props.origin}
@@ -153,6 +159,7 @@ const MyMapComponent = compose(
           </ExpansionPanelDetails>
       </ExpansionPanel>
   </>
+}
 );
 
 function MapComponent(props) {

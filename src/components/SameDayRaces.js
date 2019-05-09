@@ -110,7 +110,7 @@ const DrivingDistance = compose(
             directions: result,
           });
         } else {
-          console.log(`error fetching directions ${result}`);
+          //console.log(`error fetching directions ${result}`);
           this.setState({
             directions: null,
           });
