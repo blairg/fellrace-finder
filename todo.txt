@@ -1,5 +1,0 @@
-React Suspense/Lazy
-react router - unique page for a runner
-
-Typescript?
-Improve Serviceworker cache site for offline

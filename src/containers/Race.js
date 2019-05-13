@@ -1,80 +1,123 @@
 /* global google */
 
-import React, { Component, Suspense } from 'react';
-import { connect } from 'react-redux';
-import { animateScroll as scroll } from 'react-scroll';
-import { Async } from 'react-select';
-import _ from 'lodash';
-import 'react-select/dist/react-select.css';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { withStyles } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import React, { Component, Suspense } from "react";
+import { connect } from "react-redux";
+import { animateScroll as scroll } from "react-scroll";
+import { Async } from "react-select";
+import _ from "lodash";
+import "react-select/dist/react-select.css";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import Typography from "@material-ui/core/Typography";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { withStyles } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { partialRaceSearch, getRaceInfoByNames } from './../service/searchService';
-import { loadingProgressRaceAction, chosenRacesAction, } from './../actions/search';
-import { raceDetailsAction, } from './../actions/race';
-import { stickyAction } from './../actions/scroll';
-import { getSession,
+import {
+  partialRaceSearch,
+  getRaceInfoByNames
+} from "./../service/searchService";
+import {
+  loadingProgressRaceAction,
+  chosenRacesAction
+} from "./../actions/search";
+import { raceDetailsAction, userOriginAction } from "./../actions/race";
+import { stickyAction } from "./../actions/scroll";
+import {
+  getSession,
   setSession,
-  removeSession, getLocal, setLocal, removeLocal, } from './../service/storageService';
+  removeSession,
+  getLocal,
+  setLocal,
+  removeLocal
+} from "./../service/storageService";
 
-import LoadingProgress from './../components/LoadingProgress';
-import NoResults from './../components/NoResults';
+import LoadingProgress from "./../components/LoadingProgress";
+import NoResults from "./../components/NoResults";
 
-const ArrowUpwardButton = React.lazy(() => import('./../components/ArrowUpwardButton'));
-const ArrowDownwardButton = React.lazy(() => import('./../components/ArrowDownwardButton'));
-const RaceInfo = React.lazy(() => import('./../components/RaceInfo'));
-const ClearButton = React.lazy(() => import('./../components/ClearButton'));
-const ResultCategory = React.lazy(() => import('./../components/ResultCategory'));
-const YearResultCategory = React.lazy(() => import('./../components/YearResultCategory'));
-const RacePerformancePanel = React.lazy(() => import('./../components/RacePerformancePanel'));
-const MapComponent = React.lazy(() => import('./../components/MapComponent'));
-const SameDayRaces = React.lazy(() => import('./../components/SameDayRaces'));
+const ArrowUpwardButton = React.lazy(() =>
+  import("./../components/ArrowUpwardButton")
+);
+const ArrowDownwardButton = React.lazy(() =>
+  import("./../components/ArrowDownwardButton")
+);
+const RaceInfo = React.lazy(() => import("./../components/RaceInfo"));
+const ClearButton = React.lazy(() => import("./../components/ClearButton"));
+const ResultCategory = React.lazy(() =>
+  import("./../components/ResultCategory")
+);
+const YearResultCategory = React.lazy(() =>
+  import("./../components/YearResultCategory")
+);
+const RacePerformancePanel = React.lazy(() =>
+  import("./../components/RacePerformancePanel")
+);
+const MapComponent = React.lazy(() => import("./../components/MapComponent"));
+const SameDayRaces = React.lazy(() => import("./../components/SameDayRaces"));
 
 const styles = theme => ({
   searchField: {
-    paddingBottom: '5px',
-    paddingLeft: '5px',
-    paddingRight: '5px',
-    marginTop: '-5px',
-    zIndex: '2',
+    paddingBottom: "5px",
+    paddingLeft: "5px",
+    paddingRight: "5px",
+    marginTop: "-5px",
+    zIndex: "2"
   },
   search: {
-    position: 'sticky',
-    backgroundColor: 'white',
-    zIndex: '2 !important',
-    borderBottom: '1px solid #CCCCCC',
-    top: '40px',
-    paddingTop: '40px',
-    borderTop: '1px solid #CCCCCC',
-    paddingBottom: '2px',
+    position: "sticky",
+    backgroundColor: "white",
+    zIndex: "2 !important",
+    borderBottom: "1px solid #CCCCCC",
+    top: "40px",
+    paddingTop: "40px",
+    borderTop: "1px solid #CCCCCC",
+    paddingBottom: "2px"
   },
   progress: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing.unit * 2
   },
   expansionPanel: {
-    marginTop: '5px',
-    marginBottom: '15px',
-  },
+    marginTop: "5px",
+    marginBottom: "15px"
+  }
 });
 
-const chosenRacesKey = 'chosenRaces';
-const directionsDestinationKey = 'directionsDestinationKey';
-const originKey = 'origin';
+const chosenRacesKey = "chosenRaces";
+const directionsDestinationKey = "directionsDestinationKey";
+const originKey = "origin";
 
 class Race extends Component {
   constructor(props) {
     super(props);
 
-		this.searchRaceRef = React.createRef();
+    this.searchRaceRef = React.createRef();
   }
 
+  getOrigin = () => {
+    let cachedOrigin = getSession(originKey);
+    let origin;
+
+    if (!cachedOrigin && navigator.geolocation) {
+      var self = this;
+
+      const geoSuccess = function(position) {
+        origin = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        setSession({ key: originKey, value: JSON.stringify(origin) });
+        self.props.dispatchOrigin(origin);
+      };
+      navigator.geolocation.getCurrentPosition(geoSuccess);
+    } else {
+      origin = JSON.parse(cachedOrigin);
+      this.props.dispatchOrigin(origin);
+    }
+  };
+
   componentDidMount = () => {
-    window.addEventListener('scroll', this.onScroll, false);
+    window.addEventListener("scroll", this.onScroll, false);
 
     const racesSet = getLocal(chosenRacesKey);
 
@@ -85,11 +128,12 @@ class Race extends Component {
       this.props.dispatchLoadingProgress(false);
     }
 
+    this.getOrigin();
     scroll.scrollTo(0);
   };
 
   componentWillUnmount = () => {
-    window.removeEventListener('scroll', this.onScroll, false);
+    window.removeEventListener("scroll", this.onScroll, false);
   };
 
   shouldComponentUpdate = (nextProps, nextState) => {
@@ -97,15 +141,24 @@ class Race extends Component {
       return true;
     }
 
-    if (!_.isEqual(this.props.dispatchChosenRace, nextProps.dispatchChosenRace)) {
+    if (
+      !_.isEqual(this.props.dispatchChosenRace, nextProps.dispatchChosenRace)
+    ) {
       return true;
     }
 
-    if (!_.isEqual(this.props.dispatchLoadingProgress, nextProps.dispatchLoadingProgress)) {
+    if (
+      !_.isEqual(
+        this.props.dispatchLoadingProgress,
+        nextProps.dispatchLoadingProgress
+      )
+    ) {
       return true;
     }
 
-    if (!_.isEqual(this.props.dispatchRaceDetails, nextProps.dispatchRaceDetails)) {
+    if (
+      !_.isEqual(this.props.dispatchRaceDetails, nextProps.dispatchRaceDetails)
+    ) {
       return true;
     }
 
@@ -130,12 +183,16 @@ class Race extends Component {
     }
 
     return false;
-  }
+  };
 
   buildClearButton = () => {
-    return <Suspense fallback={<CircularProgress className={styles.prototypeprogress} />}>
-            <ClearButton onClick={this.clearClick} />
-          </Suspense>;
+    return (
+      <Suspense
+        fallback={<CircularProgress className={styles.prototypeprogress} />}
+      >
+        <ClearButton onClick={this.clearClick} />
+      </Suspense>
+    );
   };
 
   onScroll = () => {
@@ -202,7 +259,7 @@ class Race extends Component {
   };
 
   fetchRaces = async (searchValue, callback) => {
-    console.log('searching - ', searchValue);
+    console.log("searching - ", searchValue);
     this.props.dispatchLoadingProgress(true);
 
     if (!searchValue) {
@@ -217,7 +274,7 @@ class Race extends Component {
     this.props.dispatchLoadingProgress(false);
   };
 
-	debouncedFetchRaces = _.debounce(this.fetchRaces, 200);
+  debouncedFetchRaces = _.debounce(this.fetchRaces, 200);
 
   getRaces = (searchValue, callback) => {
     if (!searchValue || searchValue.length < 3) {
@@ -227,9 +284,9 @@ class Race extends Component {
     this.debouncedFetchRaces(searchValue, callback);
   };
 
-  searchForRaces = async (race) => {
+  searchForRaces = async race => {
     if (race) {
-      const cacheKey = `getRaces${race[0].display}`.replace(' ', '');
+      const cacheKey = `getRaces${race[0].display}`.replace(" ", "");
       const raceInStorage = getSession(cacheKey);
       let raceDetails;
 
@@ -271,38 +328,41 @@ class Race extends Component {
         delete raceInfo._latitude; //not needed at there is google maps directions
       }
 
-      raceInfoComponent = <Suspense fallback={<CircularProgress className={styles.progress} />}>
-                  <RaceInfo raceInfo={raceInfo} />
-                </Suspense>;
+      raceInfoComponent = (
+        <Suspense fallback={<CircularProgress className={styles.progress} />}>
+          <RaceInfo raceInfo={raceInfo} />
+        </Suspense>
+      );
     }
 
-    return (
-      <div key={raceInfo.id}>
-        {raceInfoComponent}
-      </div>
-    );
+    return <div key={raceInfo.id}>{raceInfoComponent}</div>;
   };
 
   buildResultCategories = (categoryRecords, classes) => {
     let resultCategoryComponent;
 
     if (categoryRecords) {
-      resultCategoryComponent = <Suspense fallback={<CircularProgress className={classes.progress} />}>
-                  <ResultCategory categoryRecords={categoryRecords} />
-                </Suspense>;
+      resultCategoryComponent = (
+        <Suspense fallback={<CircularProgress className={classes.progress} />}>
+          <ResultCategory categoryRecords={categoryRecords} />
+        </Suspense>
+      );
     }
 
     return (
       <React.Fragment>
-        <ExpansionPanel key={categoryRecords.length} className={classes.expansionPanel}>
-            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography className={classes.heading}>
-                  <b>Overall</b>
-              </Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-              {resultCategoryComponent}
-            </ExpansionPanelDetails>
+        <ExpansionPanel
+          key={categoryRecords.length}
+          className={classes.expansionPanel}
+        >
+          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography className={classes.heading}>
+              <b>Overall</b>
+            </Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            {resultCategoryComponent}
+          </ExpansionPanelDetails>
         </ExpansionPanel>
       </React.Fragment>
     );
@@ -310,81 +370,79 @@ class Race extends Component {
 
   buildYearResultCategories = races => {
     let yearResultsComponent;
- 
+
     if (races) {
-      yearResultsComponent = <Suspense fallback={<CircularProgress className={styles.progress} />}>
-        <YearResultCategory races={races} />
-        <br />
-        <br />
-        <br />
-        <br />
-      </Suspense>;
+      yearResultsComponent = (
+        <Suspense fallback={<CircularProgress className={styles.progress} />}>
+          <YearResultCategory races={races} />
+          <br />
+          <br />
+          <br />
+          <br />
+        </Suspense>
+      );
     }
 
     return yearResultsComponent;
   };
 
   buildYearPerformanceGraph = (races, progressClass) => {
-    const performanceData = races.map((race) => {
-      if (race.performance > 0) {
-        return [`${race.year}`, `${race.performance}%`];
-      }
-    }).filter((race) => race !== undefined);
+    const performanceData = races
+      .map(race => {
+        if (race.performance > 0) {
+          return [`${race.year}`, `${race.performance}%`];
+        }
+      })
+      .filter(race => race !== undefined);
 
-    return <Suspense fallback={<CircularProgress className={progressClass} />}>
-            <RacePerformancePanel raceData={performanceData} />
-           </Suspense>;
-  }
+    return (
+      <Suspense fallback={<CircularProgress className={progressClass} />}>
+        <RacePerformancePanel raceData={performanceData} />
+      </Suspense>
+    );
+  };
 
-  buildDownwardArrow = (progress) => {
+  buildDownwardArrow = progress => {
     return (
       <Suspense fallback={<CircularProgress className={progress} />}>
-              <ArrowDownwardButton onClick={this.scrollToBottomClick} />
-            </Suspense>
-    )
+        <ArrowDownwardButton onClick={this.scrollToBottomClick} />
+      </Suspense>
+    );
   };
 
-  buildMapComponent = (destination, progress) => { 
-    let cachedOrigin = getSession(originKey);
-    let origin;
-
-    if (!cachedOrigin && navigator.geolocation) {
-      const geoSuccess = function(position) {
-        origin = { lat: position.coords.latitude, lng: position.coords.longitude };
-        setSession({ key: originKey, value: JSON.stringify(origin)});
-      };
-      navigator.geolocation.getCurrentPosition(geoSuccess);
-    } else {
-      origin = JSON.parse(cachedOrigin);
-    }
-
-    return <Suspense fallback={<CircularProgress className={progress} />}>
-        <MapComponent destination={destination}
-                      origin={origin}
-         />
-      </Suspense>;
+  buildMapComponent = (origin, destination, progress) => {
+    return (
+      <Suspense fallback={<CircularProgress className={progress} />}>
+        <MapComponent destination={destination} origin={origin} />
+      </Suspense>
+    );
   };
 
-  buildSameDayRaces = (races, sameDayRaces, progress) => { 
+  buildSameDayRaces = (origin, races, sameDayRaces, progress) => {
     const yearOfFirstRace = parseInt(races[0].date.substring(6, 10));
     const yearNow = new Date().getFullYear();
 
-    if (yearOfFirstRace < yearNow || !sameDayRaces || sameDayRaces.length === 0) {
+    if (
+      yearOfFirstRace < yearNow ||
+      !sameDayRaces ||
+      sameDayRaces.length === 0
+    ) {
       return null;
     }
 
-    return <Suspense fallback={<CircularProgress className={progress} />}>
-        <SameDayRaces races={sameDayRaces} />
-      </Suspense>;
+    return (
+      <Suspense fallback={<CircularProgress className={progress} />}>
+        <SameDayRaces origin={origin} races={sameDayRaces} />
+      </Suspense>
+    );
   };
-
 
   render() {
     const { progress, searchField, search } = this.props.classes;
     const { loadingRaceProgress, chosenRaces } = this.props.searchReducer;
-    const { raceDetails } = this.props.raceReducer;
+    const { raceDetails, origin } = this.props.raceReducer;
     const { sticky } = this.props.scrollReducer;
-    const searchClass = sticky ? search : '';
+    const searchClass = sticky ? search : "";
     let clearButton;
     let loadingResults;
     let raceInfoComponent;
@@ -407,20 +465,49 @@ class Race extends Component {
 
     if (raceDetails) {
       raceInfoComponent = this.buildRaceInfo(raceDetails.raceInfo);
-      resultCategoryComponent = this.buildResultCategories(raceDetails.categoryRecords, this.props.classes);
+      resultCategoryComponent = this.buildResultCategories(
+        raceDetails.categoryRecords,
+        this.props.classes
+      );
       yearResultsComponent = this.buildYearResultCategories(raceDetails.races);
-      racePerformancePanelComponent = this.buildYearPerformanceGraph(raceDetails.races, progress);
-      const destination = { lat: raceDetails.properties.latitude, lng: raceDetails.properties.longitude };
-      mapDirectionComponent = this.buildMapComponent(destination, progress);
+      racePerformancePanelComponent = this.buildYearPerformanceGraph(
+        raceDetails.races,
+        progress
+      );
       downwardArrowButtonShow = this.buildDownwardArrow(progress);
-      sameDayRacesComponent = this.buildSameDayRaces(raceDetails.races, raceDetails.racesSameDay, progress);
+
+      if (origin) {
+        sameDayRacesComponent = this.buildSameDayRaces(
+          origin,
+          raceDetails.races,
+          raceDetails.racesSameDay,
+          progress
+        );
+      }
+
+      if (
+        origin &&
+        raceDetails.properties &&
+        raceDetails.properties.latitude &&
+        raceDetails.properties.latitude !== 0
+      ) {
+        const destination = {
+          lat: raceDetails.properties.latitude,
+          lng: raceDetails.properties.longitude
+        };
+        mapDirectionComponent = this.buildMapComponent(
+          origin,
+          destination,
+          progress
+        );
+      }
     }
 
     if (sticky) {
       scrollToTopButton = (
         <Suspense fallback={<CircularProgress className={progress} />}>
-              <ArrowUpwardButton onClick={this.scrollToTopClick} />
-            </Suspense>
+          <ArrowUpwardButton onClick={this.scrollToTopClick} />
+        </Suspense>
       );
     }
 
@@ -455,19 +542,24 @@ class Race extends Component {
         {downwardArrowButtonShow}
         {scrollToTopButton}
       </React.Fragment>
-  	);
- 	}
+    );
+  }
 }
 
 const mapStateToProps = state => ({
   ...state
- });
+});
 
- const mapDispatchToProps = dispatch => ({
-  dispatchLoadingProgress: (loadingProgress) => dispatch(loadingProgressRaceAction(loadingProgress)),
-  dispatchChosenRace: (chosenRace) => dispatch(chosenRacesAction(chosenRace)),
-  dispatchRaceDetails: (raceDetails) => dispatch(raceDetailsAction(raceDetails)),
-  dispatchSticky: (sticky) => dispatch(stickyAction(sticky)),
- });
+const mapDispatchToProps = dispatch => ({
+  dispatchLoadingProgress: loadingProgress =>
+    dispatch(loadingProgressRaceAction(loadingProgress)),
+  dispatchChosenRace: chosenRace => dispatch(chosenRacesAction(chosenRace)),
+  dispatchRaceDetails: raceDetails => dispatch(raceDetailsAction(raceDetails)),
+  dispatchSticky: sticky => dispatch(stickyAction(sticky)),
+  dispatchOrigin: origin => dispatch(userOriginAction(origin))
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(React.memo(Race)));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(React.memo(Race)));
