@@ -1,32 +1,38 @@
 import axios from "axios";
 
-import { getSession, setSession } from "./storageService";
-
 export async function getEvents() {
-  console.log("calling getEvents");
-  const cacheKey = "calendarService.calendarEvents";
-  const sessionEvents = getSession(cacheKey);
-
-  if (sessionEvents) {
-    return JSON.parse(sessionEvents);
-  }
-
   let events = null;
 
   await axios
     .get(`${process.env.REACT_APP_API_SERVER}/calendarEvents`)
     .then(function(response) {
+      const isValidDate = dateValue => {
+        const timestamp = Date.parse(dateValue);
+
+        return isNaN(timestamp);
+      };
       events = [];
 
       for (let i = 0; i < response.data.length; i++) {
+        if (
+          isValidDate(response.data[i].start) ||
+          isValidDate(response.data[i].end)
+        ) {
+          continue;
+        }
+
+        const startDate = new Date(Date.parse(response.data[i].start));
+        const endDate = new Date(Date.parse(response.data[i].end));
+
         events.push({
           id: response.data[i].id,
           title: response.data[i].title,
-          start: new Date(response.data[i].start),
-          end: new Date(response.data[i].end),
+          start: startDate,
+          end: endDate,
           short: response.data[i].short,
           medium: response.data[i].medium,
-          long: response.data[i].long
+          long: response.data[i].long,
+          url: response.data[i].url
         });
       }
 
@@ -35,8 +41,6 @@ export async function getEvents() {
     .catch(function(error) {
       console.log(error);
     });
-
-  //setSession({key: cacheKey, value: JSON.stringify(events)});
 
   return events;
 }

@@ -1,47 +1,94 @@
+/* global window */
+
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import BigCalendar from "react-big-calendar";
 import moment from "moment";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Grid from "@material-ui/core/Grid";
+import Avatar from "@material-ui/core/Avatar";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
-import dates from "../utils/dates";
+//import { getSession, setSession, removeSession } from './../service/storageService';
 
 const localizer = BigCalendar.momentLocalizer(moment);
 
 const styles = theme => ({
   bigRaceCalendar: {
     minHeight: "400px"
+  },
+  short: {
+    backgroundColor: "lightgreen",
+    color: "black",
+    marginRight: "2px"
+  },
+  medium: {
+    backgroundColor: "orange",
+    color: "black",
+    marginRight: "2px"
+  },
+  long: {
+    backgroundColor: "red",
+    color: "white"
   }
 });
 
-const now = new Date();
+const allViews = Object.keys(BigCalendar.Views).map(k => BigCalendar.Views[k]);
 
-const events = [
-  {
-    id: 0,
-    title: "All Day Event very long title",
-    allDay: true,
-    start: new Date(2018, 3, 0),
-    end: new Date(2018, 3, 1)
-  },
-  {
-    id: 1,
-    title: "Long Event",
-    start: new Date(2018, 3, 7),
-    end: new Date(2018, 3, 10)
-  },
+const propGetter = (event, start, end, isSelected) => {
+  // @TODO: Attempt at trying to make the name open the race in a new tab.
+  // const cacheKey = 'RaceCalendar.propGetter';
 
-  {
-    id: 2,
-    title: "DTS STARTS",
-    start: new Date(2016, 2, 13, 0, 0, 0),
-    end: new Date(2016, 2, 20, 0, 0, 0)
+  // if (isSelected) {
+  //   console.log(event.url, isSelected);
+  //   const cachedValue = getSession(cacheKey);
+
+  //   if (cachedValue && cachedValue === event.url) {
+  //     removeSession(cacheKey);
+  //   }
+
+  //   if (cachedValue && cachedValue !== event.url) {
+  //     removeSession(cacheKey);
+  //     window.open(event.url, '', null, false);
+  //   }
+
+  //   if (!cachedValue) {
+  //     setSession({key: cacheKey, value: event.url});
+  //     window.open(event.url, '', null, false);
+  //   }
+  //   //console.log(event);
+  // } else {
+  //   removeSession(cacheKey);
+  // }
+
+  let newStyle = {
+    backgroundColor: "lightgrey",
+    color: "black",
+    borderRadius: "0px",
+    border: "none"
+  };
+
+  if (event.short) {
+    newStyle.backgroundColor = styles().short.backgroundColor;
+    newStyle.color = styles().short.color;
   }
-];
 
-let allViews = Object.keys(BigCalendar.Views).map(k => BigCalendar.Views[k]);
+  if (event.medium) {
+    newStyle.backgroundColor = styles().medium.backgroundColor;
+    newStyle.color = styles().medium.color;
+  }
+
+  if (event.long) {
+    newStyle.backgroundColor = styles().long.backgroundColor;
+    newStyle.color = styles().long.color;
+  }
+
+  return {
+    className: "",
+    style: newStyle
+  };
+};
 
 function RaceCalendar(props) {
   const { classes, events } = props;
@@ -49,54 +96,40 @@ function RaceCalendar(props) {
   if (!events) {
     return (
       <div>
-        <CircularProgress />
+        <CircularProgress className={classes.bigRaceCalendar} />
       </div>
     );
   }
 
   return (
     <div>
+      <Grid container justify="center" alignItems="center">
+        <Avatar className={classes.short} alt="Short Races">
+          S
+        </Avatar>
+        <Avatar className={classes.medium} alt="Medium Races">
+          M
+        </Avatar>
+        <Avatar className={classes.long} alt="Long Races">
+          L
+        </Avatar>
+      </Grid>
+      <br />
+      <br />
       <BigCalendar
+        popup
         className={classes.bigRaceCalendar}
         events={events}
         views={allViews}
-        // step={60}
+        timeslots={4}
         showMultiDayTimes
         defaultView={BigCalendar.Views.MONTH}
-        // max={dates.add(dates.endOf(now, 'day'), -1, 'hours')}
-        // max={dates.add(dates.endOf(new Date(2016, 1, 6), 'day'), -1, 'hours')}
         startAccessor="start"
         endAccessor="end"
         defaultDate={new Date()}
         scrollToTime={new Date(1970, 1, 1, 6)}
         localizer={localizer}
-        eventPropGetter={(event, start, end, isSelected) => {
-          let newStyle = {
-            backgroundColor: "lightgrey",
-            color: "black",
-            borderRadius: "0px",
-            border: "none"
-          };
-
-          if (event.short) {
-            newStyle.backgroundColor = "lightgreen";
-          }
-
-          if (event.medium) {
-            newStyle.backgroundColor = "orange";
-            newStyle.color = "white";
-          }
-
-          if (event.long) {
-            newStyle.backgroundColor = "red";
-            newStyle.color = "white";
-          }
-
-          return {
-            className: "",
-            style: newStyle
-          };
-        }}
+        eventPropGetter={propGetter}
       />
       <br />
       <br />

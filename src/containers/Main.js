@@ -1,15 +1,17 @@
 import React, { PureComponent, Suspense } from "react";
 import { connect } from "react-redux";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import MenuBar from "./../components/MenuBar";
 import Runner from "./Runner";
 import Race from "./Race";
-import RaceCalendar from "./../components/RaceCalendar";
 
 import { menuAction, menuToggleAction } from "./../actions/menu";
 import { eventsAction } from "./../actions/calendar";
 import { getLocal, setLocal } from "./../service/storageService";
 import { getEvents } from "./../service/calendarService";
+
+const RaceCalendar = React.lazy(() => import("./../components/RaceCalendar"));
 
 const cacheKey = "Main-menuoption";
 
@@ -105,7 +107,11 @@ class Main extends PureComponent {
     }
 
     if (events && !race && calendar && !runner) {
-      menuOption = <RaceCalendar events={events} />;
+      menuOption = (
+        <Suspense fallback={<CircularProgress />}>
+          <RaceCalendar events={events} />
+        </Suspense>
+      );
     }
 
     if (race || runner || calendar) {
