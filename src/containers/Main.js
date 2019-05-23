@@ -1,82 +1,148 @@
-import React, { PureComponent, Suspense } from 'react';
-import { connect } from 'react-redux';
+import React, { PureComponent, Suspense } from "react";
+import { connect } from "react-redux";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import MenuBar from './../components/MenuBar';
-import Runner from './Runner';
-import Race from './Race';
+import MenuBar from "./../components/MenuBar";
+import Runner from "./Runner";
+import Race from "./Race";
 
-import { menuAction, menuToggleAction } from './../actions/menu';
-import { getLocal, setLocal,  } from './../service/storageService';
+import { menuAction, menuToggleAction } from "./../actions/menu";
+import { eventsAction } from "./../actions/calendar";
+import { getLocal, setLocal } from "./../service/storageService";
+import { getEvents } from "./../service/calendarService";
 
-const cacheKey = 'Main-menuoption';
+const RaceCalendar = React.lazy(() => import("./../components/RaceCalendar"));
+
+const cacheKey = "Main-menuoption";
 
 class Main extends PureComponent {
   constructor(props) {
     super(props);
-	}
-	
-	componentWillMount() {
-		const cachedValue = getLocal(cacheKey);
+  }
 
-		if (cachedValue) {
-			if (cachedValue === 'race') {
-				this.props.dispatchMenuAction({race: true, runner: false});
-			} else {
-				this.props.dispatchMenuAction({race: false, runner: true});
-			}
+  componentWillMount() {
+    const cachedValue = getLocal(cacheKey);
 
-			this.props.dispatchMenuToggleAction(false);
-		}
-	}
+    if (cachedValue) {
+      if (cachedValue === "race") {
+        this.props.dispatchMenuAction({
+          race: true,
+          runner: false,
+          calendar: false
+        });
+      }
 
-	raceOnClick = async event => {
+      if (cachedValue === "runner") {
+        this.props.dispatchMenuAction({
+          race: false,
+          runner: true,
+          calendar: false
+        });
+      }
+
+      if (cachedValue === "calendar") {
+        this.props.dispatchMenuAction({
+          race: false,
+          runner: false,
+          calendar: true
+        });
+      }
+
+      this.props.dispatchMenuToggleAction(false);
+    }
+  }
+
+  async componentDidMount() {
+    this.props.dispatchCalendarEventsAction(await getEvents());
+  }
+
+  raceOnClick = async event => {
     event.preventDefault();
-		setLocal({key: cacheKey, value: 'race'});
+    setLocal({ key: cacheKey, value: "race" });
 
-		this.props.dispatchMenuAction({race: true, runner: false});
-		this.props.dispatchMenuToggleAction(false);
+    this.props.dispatchMenuAction({
+      race: true,
+      runner: false,
+      calendar: false
+    });
+    this.props.dispatchMenuToggleAction(false);
   };
 
-	runnerOnClick = async event => {
+  runnerOnClick = async event => {
     event.preventDefault();
-		setLocal({key: cacheKey, value: 'runner'});
+    setLocal({ key: cacheKey, value: "runner" });
 
-		this.props.dispatchMenuAction({race: false, runner: true});
-		this.props.dispatchMenuToggleAction(false);
+    this.props.dispatchMenuAction({
+      race: false,
+      runner: true,
+      calendar: false
+    });
+    this.props.dispatchMenuToggleAction(false);
+  };
+
+  calendarOnClick = async event => {
+    event.preventDefault();
+    setLocal({ key: cacheKey, value: "calendar" });
+
+    this.props.dispatchMenuAction({
+      race: false,
+      runner: false,
+      calendar: true
+    });
+    this.props.dispatchMenuToggleAction(false);
   };
 
   render() {
-		const { race, runner } = this.props.menuReducer;
-		let runnerOrRaceSearch;
-		let hasUserSelectedMenuOption = false;
+    const { race, runner, calendar } = this.props.menuReducer;
+    const { events } = this.props.calendarReducer;
+    let menuOption;
+    let hasUserSelectedMenuOption = false;
 
-		if (!race) {
-			runnerOrRaceSearch = <Runner />;
-		} else {
-			runnerOrRaceSearch = <Race />;
-		}
+    if (!race && !calendar && runner) {
+      menuOption = <Runner />;
+    }
 
-		if (race || runner) {
-			hasUserSelectedMenuOption = true;
-		}
+    if (race && !calendar && !runner) {
+      menuOption = <Race />;
+    }
+
+    if (events && !race && calendar && !runner) {
+      menuOption = (
+        <Suspense fallback={<CircularProgress />}>
+          <RaceCalendar events={events} />
+        </Suspense>
+      );
+    }
+
+    if (race || runner || calendar) {
+      hasUserSelectedMenuOption = true;
+    }
 
     return (
       <React.Fragment>
-				<MenuBar raceOnClick={this.raceOnClick} runnerOnClick={this.runnerOnClick} 
-								 closeMenu={hasUserSelectedMenuOption} />
-				{runnerOrRaceSearch}
+        <MenuBar
+          raceOnClick={this.raceOnClick}
+          runnerOnClick={this.runnerOnClick}
+          calendarOnClick={this.calendarOnClick}
+          closeMenu={hasUserSelectedMenuOption}
+        />
+        {menuOption}
       </React.Fragment>
-  	);
- 	}
+    );
+  }
 }
 
 const mapStateToProps = state => ({
   ...state
- });
+});
 
- const mapDispatchToProps = dispatch => ({
-	 dispatchMenuAction: (menu) => dispatch(menuAction(menu)),
-	 dispatchMenuToggleAction: (menuOpen) => dispatch(menuToggleAction(menuOpen)),
- });
+const mapDispatchToProps = dispatch => ({
+  dispatchMenuAction: menu => dispatch(menuAction(menu)),
+  dispatchMenuToggleAction: menuOpen => dispatch(menuToggleAction(menuOpen)),
+  dispatchCalendarEventsAction: events => dispatch(eventsAction(events))
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Main);

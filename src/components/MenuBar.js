@@ -16,7 +16,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
-import EventNoteIcon from '@material-ui/icons/EventNote';
+import EventSeatIcon from '@material-ui/icons/EventSeat';
+import DateRangeIcon from '@material-ui/icons/DateRange';
 
 import { menuToggleAction } from './../actions/menu';
 
@@ -93,7 +94,7 @@ class MenuBar extends React.Component {
   };
 
   render() {
-    const { classes, theme, runnerOnClick, raceOnClick, menuReducer } = this.props;
+    const { classes, theme, runnerOnClick, raceOnClick, calendarOnClick, menuReducer } = this.props;
     const { menuOpen } = menuReducer;
 
     return (
@@ -137,17 +138,17 @@ class MenuBar extends React.Component {
                 <ListItemText primary='Runner' />
             </ListItem>
             <ListItem button key='Race' onClick={raceOnClick}>
-                <ListItemIcon><EventNoteIcon /></ListItemIcon>
+                <ListItemIcon><EventSeatIcon /></ListItemIcon>
                 <ListItemText primary='Race' />
             </ListItem>
             {/* <ListItem button key='Club'>
                 <ListItemIcon><MapIcon /></ListItemIcon>
                 <ListItemText primary='Club' />
-            </ListItem>
-            <ListItem button key='Calendar'>
-                <ListItemIcon><MapIcon /></ListItemIcon>
+        </ListItem> */}
+            <ListItem button key='Calendar' onClick={calendarOnClick}>
+                <ListItemIcon><DateRangeIcon /></ListItemIcon>
                 <ListItemText primary='Calendar' />
-            </ListItem> */}
+            </ListItem> 
           </List>
         </Drawer>
       </div>
