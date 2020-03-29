@@ -14,7 +14,7 @@
     "firebase": "^7.13.0",
     "html-entities": "^1.2.1",
     "intersection-observer": "^0.7.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "moment": "^2.24.0",
     "parse-ms": "^2.1.0",
     "react": "^16.8.6",
