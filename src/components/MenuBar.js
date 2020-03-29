@@ -87,8 +87,6 @@ const styles = theme => ({
 class MenuBar extends React.Component {
   constructor(props) {
     super(props);
-
-    this.currentCount = 0;
   }
 
   componentDidMount() {
