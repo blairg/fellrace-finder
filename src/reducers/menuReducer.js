@@ -1,7 +1,17 @@
-import { MENU_ACTION, MENU_TOGGLE_ACTION } from "../actionTypes/menu";
+import {
+  MENU_ACTION,
+  MENU_TOGGLE_ACTION,
+  MENU_COUNT_LOGGED_IN
+} from "../actionTypes/menu";
 
 export default (
-  state = { runner: false, race: false, calendar: false, menuOpen: false },
+  state = {
+    runner: false,
+    race: false,
+    calendar: true,
+    menuOpen: false,
+    count: 0
+  },
   action
 ) => {
   switch (action.type) {
@@ -14,6 +24,10 @@ export default (
     case MENU_TOGGLE_ACTION:
       return Object.assign({}, state, {
         menuOpen: action.payload
+      });
+    case MENU_COUNT_LOGGED_IN:
+      return Object.assign({}, state, {
+        count: action.payload
       });
     default:
       return state;
