@@ -5,6 +5,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import MenuBar from "./../components/MenuBar";
 import Runner from "./Runner";
 import Race from "./Race";
+import RaceList from "./RaceList";
 
 import { menuAction, menuToggleAction } from "./../actions/menu";
 import { eventsAction } from "./../actions/calendar";
@@ -28,7 +29,8 @@ class Main extends PureComponent {
         this.props.dispatchMenuAction({
           race: true,
           runner: false,
-          calendar: false
+          calendar: false,
+          allRaces: false
         });
       }
 
@@ -36,7 +38,8 @@ class Main extends PureComponent {
         this.props.dispatchMenuAction({
           race: false,
           runner: true,
-          calendar: false
+          calendar: false,
+          allRaces: false
         });
       }
 
@@ -44,7 +47,17 @@ class Main extends PureComponent {
         this.props.dispatchMenuAction({
           race: false,
           runner: false,
-          calendar: true
+          calendar: true,
+          allRaces: false
+        });
+      }
+
+      if (cachedValue === "allraces") {
+        this.props.dispatchMenuAction({
+          race: false,
+          runner: false,
+          calendar: false,
+          allRaces: true
         });
       }
 
@@ -63,7 +76,21 @@ class Main extends PureComponent {
     this.props.dispatchMenuAction({
       race: true,
       runner: false,
-      calendar: false
+      calendar: false,
+      allRaces: false
+    });
+    this.props.dispatchMenuToggleAction(false);
+  };
+
+  allRacesOnClick = async event => {
+    event.preventDefault();
+    setLocal({ key: cacheKey, value: "allraces" });
+
+    this.props.dispatchMenuAction({
+      race: false,
+      runner: false,
+      calendar: false,
+      allRaces: true
     });
     this.props.dispatchMenuToggleAction(false);
   };
@@ -93,20 +120,28 @@ class Main extends PureComponent {
   };
 
   render() {
-    const { race, runner, calendar } = this.props.menuReducer;
+    const { race, runner, calendar, allRaces } = this.props.menuReducer;
     const { events } = this.props.calendarReducer;
     let menuOption;
     let hasUserSelectedMenuOption = false;
 
-    if (!race && !calendar && runner) {
+    if (!race && !calendar && runner && !allRaces) {
       menuOption = <Runner />;
     }
 
-    if (race && !calendar && !runner) {
+    if (race && !calendar && !runner && !allRaces) {
       menuOption = <Race />;
     }
 
-    if (events && !race && calendar && !runner) {
+    if (!race && !calendar && !runner && allRaces) {
+      menuOption = (
+        <Suspense fallback={<CircularProgress />}>
+          <RaceList />
+        </Suspense>
+      );
+    }
+
+    if (events && !race && calendar && !runner && !allRaces) {
       menuOption = (
         <Suspense fallback={<CircularProgress />}>
           <RaceCalendar events={events} />
@@ -114,7 +149,7 @@ class Main extends PureComponent {
       );
     }
 
-    if (race || runner || calendar) {
+    if (race || runner || calendar || allRaces) {
       hasUserSelectedMenuOption = true;
     }
 
@@ -123,6 +158,7 @@ class Main extends PureComponent {
         <MenuBar
           raceOnClick={this.raceOnClick}
           runnerOnClick={this.runnerOnClick}
+          allRacesOnClick={this.allRacesOnClick}
           calendarOnClick={this.calendarOnClick}
           closeMenu={hasUserSelectedMenuOption}
         />
