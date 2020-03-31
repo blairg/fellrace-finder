@@ -8,6 +8,7 @@ export default (
   state = {
     runner: false,
     race: false,
+    allRaces: false,
     calendar: true,
     menuOpen: false,
     count: 0
@@ -19,6 +20,7 @@ export default (
       return Object.assign({}, state, {
         runner: action.payload.runner,
         race: action.payload.race,
+        allRaces: action.payload.allRaces,
         calendar: action.payload.calendar
       });
     case MENU_TOGGLE_ACTION:

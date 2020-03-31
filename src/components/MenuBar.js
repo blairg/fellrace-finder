@@ -18,6 +18,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import DirectionsRunIcon from "@material-ui/icons/DirectionsRun";
 import EventSeatIcon from "@material-ui/icons/EventSeat";
 import DateRangeIcon from "@material-ui/icons/DateRange";
+import AssistantPhotoIcon from "@material-ui/icons/AssistantPhoto";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import UsersOnline from "./UsersOnline";
@@ -84,24 +85,25 @@ const styles = theme => ({
   }
 });
 
+const devMode = process.env.REACT_APP_DEV_MODE === "false" ? "dev" : "prod";
+
 class MenuBar extends React.Component {
   constructor(props) {
     super(props);
   }
 
   componentDidMount() {
-    const itemsRef = Firebase.database().ref("usersLoggedIn/count");
+    const itemsRef = Firebase.database().ref(`${devMode}/usersLoggedIn/count`);
 
     itemsRef.on("value", snapshot => {
       const count = snapshot.val();
       this.props.dispatchMenuCountLoggedInAction(count);
-
       itemsRef.onDisconnect().set(count > 0 ? count - 1 : 0);
     });
 
     itemsRef.once("value", snapshot => {
       const count = snapshot.val();
-      itemsRef.set(count > 0 ? count + 1 : 1);
+      itemsRef.set(count >= 0 ? count + 1 : 1);
     });
   }
 
@@ -119,6 +121,7 @@ class MenuBar extends React.Component {
       theme,
       runnerOnClick,
       raceOnClick,
+      allRacesOnClick,
       calendarOnClick,
       menuReducer
     } = this.props;
@@ -185,6 +188,12 @@ class MenuBar extends React.Component {
                 <EventSeatIcon />
               </ListItemIcon>
               <ListItemText primary="Race" />
+            </ListItem>
+            <ListItem button key="All Races" onClick={allRacesOnClick}>
+              <ListItemIcon>
+                <AssistantPhotoIcon />
+              </ListItemIcon>
+              <ListItemText primary="All Races" />
             </ListItem>
             {/* <ListItem button key='Club'>
                 <ListItemIcon><MapIcon /></ListItemIcon>
