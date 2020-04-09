@@ -12,10 +12,6 @@ import { allRacesAction } from "./../actions/race";
 const styles = theme => ({});
 
 class RaceList extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   componentDidMount = async () => {
     this.props.dispatchAllRacesAction(await getAllRaces());
   };

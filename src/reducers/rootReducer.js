@@ -6,6 +6,7 @@ import scrollReducer from "./scrollReducer";
 import menuReducer from "./menuReducer";
 import raceReducer from "./raceReducer";
 import calendarReducer from "./calendarReducer";
+import userReducer from "./userReducer";
 
 export default combineReducers({
   searchReducer,
@@ -13,5 +14,6 @@ export default combineReducers({
   scrollReducer,
   menuReducer,
   raceReducer,
-  calendarReducer
+  calendarReducer,
+  userReducer
 });

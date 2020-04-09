@@ -18,7 +18,6 @@ import DirectionsCar from "@material-ui/icons/DirectionsCar";
 import EventNoteIcon from "@material-ui/icons/EventNote";
 
 import smallLoaderGif from "./../images/small-loader.gif";
-import { getSession, setSession } from "./../service/storageService";
 
 const margins = {
   marginRight: "10px",
@@ -78,9 +77,7 @@ const buildMapsUrl = (origin, venue) => {
 
 const DrivingDistance = compose(
   withProps({
-    googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${
-      process.env.REACT_APP_MAPS_KEY
-    }`,
+    googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAPS_KEY}`,
     loadingElement: <div style={{ height: `0%` }} />,
     containerElement: <div style={{ height: `0px` }} />,
     mapElement: <div style={{ height: `0%` }} />
@@ -117,7 +114,7 @@ const DrivingDistance = compose(
     ? props.directions.routes[0].legs[0].duration.text
     : "";
   const googleUrl = buildMapsUrl(props.origin, props.venue);
-  const anchorTag = `<a href=${googleUrl} target='_blank'>${duration}</a>`;
+  const anchorTag = `<a href=${googleUrl} target='_blank' rel='noopener noreferrer'>${duration}</a>`;
 
   if (!props.directions) {
     return <div />;
@@ -140,7 +137,7 @@ function SameDayRaces(props) {
   for (let i = 0; i < races.length; i++) {
     const raceUrl = `https://www.fellrunner.org.uk/races.php?id=${races[i].id}`;
     const googleUrl = buildMapsUrl(origin, races[i].venue);
-    const anchorTag = `<a href=${googleUrl} target='_blank'>Get Directions</a>`;
+    const anchorTag = `<a href=${googleUrl} target='_blank' rel="noopener noreferrer">Get Directions</a>`;
 
     const directionsComponent =
       origin && races[i].location && races[i].location.lat > 0 ? (
@@ -161,7 +158,7 @@ function SameDayRaces(props) {
       <TableRow key={races[i].id}>
         <TableCell align="right">
           <EventNoteIcon />
-          <a href={raceUrl} target="_blank">
+          <a href={raceUrl} target="_blank" rel="noopener noreferrer">
             {races[i].name}
           </a>
         </TableCell>

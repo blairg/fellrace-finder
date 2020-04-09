@@ -259,7 +259,6 @@ class Race extends Component {
   };
 
   fetchRaces = async (searchValue, callback) => {
-    console.log("searching - ", searchValue);
     this.props.dispatchLoadingProgress(true);
 
     if (!searchValue) {

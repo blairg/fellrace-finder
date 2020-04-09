@@ -7,6 +7,13 @@ const entities = new AllHtmlEntities();
 
 export async function search(runnerNames, startIndex, endIndex) {
   const runnersNamedJoined = runnerNames.join("$$");
+  const cacheKey = `search${runnersNamedJoined}`;
+  const runnersInSessionStorage = getSession(cacheKey);
+
+  if (runnersInSessionStorage) {
+    return runnersInSessionStorage;
+  }
+
   let races = null;
 
   await axios
@@ -21,6 +28,11 @@ export async function search(runnerNames, startIndex, endIndex) {
       console.log(error);
     });
 
+  setSession({
+    key: cacheKey,
+    value: races
+  });
+
   return races;
 }
 
@@ -29,6 +41,13 @@ export async function searchByRace(runnerNames, raceNames) {
   let encodedRaceNames = raceNames.replace("/", "**");
   encodedRaceNames = entities.encode(encodedRaceNames);
   let races = null;
+
+  const cacheKey = `searchByRace${runnersNamedJoined}${encodedRaceNames}`;
+  const racesInSessionStorage = getSession(cacheKey);
+
+  if (racesInSessionStorage) {
+    return racesInSessionStorage;
+  }
 
   await axios
     .get(
@@ -41,6 +60,11 @@ export async function searchByRace(runnerNames, raceNames) {
     .catch(function(error) {
       console.log(error);
     });
+
+  setSession({
+    key: cacheKey,
+    value: races
+  });
 
   return races;
 }

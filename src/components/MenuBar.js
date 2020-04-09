@@ -20,6 +20,9 @@ import EventSeatIcon from "@material-ui/icons/EventSeat";
 import DateRangeIcon from "@material-ui/icons/DateRange";
 import AssistantPhotoIcon from "@material-ui/icons/AssistantPhoto";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Brightness1Icon from "@material-ui/icons/Brightness1";
+import PanoramaFishEye from "@material-ui/icons/PanoramaFishEye";
+import PermIdentityIcon from "@material-ui/icons/PermIdentity";
 
 import UsersOnline from "./UsersOnline";
 import Firebase from "../utils/firebase";
@@ -88,10 +91,6 @@ const styles = theme => ({
 const devMode = process.env.REACT_APP_DEV_MODE === "false" ? "dev" : "prod";
 
 class MenuBar extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   componentDidMount() {
     const itemsRef = Firebase.database().ref(`${devMode}/usersLoggedIn/count`);
 
@@ -123,15 +122,36 @@ class MenuBar extends React.Component {
       raceOnClick,
       allRacesOnClick,
       calendarOnClick,
-      menuReducer
+      loginOnClick,
+      menuReducer,
+      userReducer,
+      loggedIn
     } = this.props;
     const { menuOpen, count } = menuReducer;
+    const { userDetails } = userReducer;
+    const loggedInIcon = !userDetails ? (
+      <Suspense fallback={<CircularProgress color="secondary" />}>
+        <PanoramaFishEye />
+      </Suspense>
+    ) : (
+      <Suspense fallback={<CircularProgress color="secondary" />}>
+        <Brightness1Icon />
+      </Suspense>
+    );
     const numberLoggedIn =
       count > 1 ? (
         <Suspense fallback={<CircularProgress color="secondary" />}>
           <UsersOnline count={count} />
         </Suspense>
       ) : null;
+    const loggedInMenuOption = loggedIn ? (
+      <ListItem button key="Login" onClick={loginOnClick}>
+        <ListItemIcon>
+          <PermIdentityIcon />
+        </ListItemIcon>
+        <ListItemText primary="Login" />
+      </ListItem>
+    ) : null;
 
     return (
       <div className={classes.root}>
@@ -156,6 +176,7 @@ class MenuBar extends React.Component {
             </IconButton>
           </Toolbar>
           {numberLoggedIn}
+          {loggedInIcon}
         </AppBar>
         <Drawer
           className={classes.drawer}
@@ -177,6 +198,7 @@ class MenuBar extends React.Component {
           </div>
           <Divider />
           <List>
+            {loggedInMenuOption}
             <ListItem button key="Runner" onClick={runnerOnClick}>
               <ListItemIcon>
                 <DirectionsRunIcon />

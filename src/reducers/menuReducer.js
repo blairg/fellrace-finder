@@ -10,6 +10,7 @@ export default (
     race: false,
     allRaces: false,
     calendar: true,
+    login: false,
     menuOpen: false,
     count: 0
   },
@@ -21,6 +22,7 @@ export default (
         runner: action.payload.runner,
         race: action.payload.race,
         allRaces: action.payload.allRaces,
+        login: action.payload.login,
         calendar: action.payload.calendar
       });
     case MENU_TOGGLE_ACTION:
