@@ -13,7 +13,7 @@ const styles = theme => ({
   numLoggedInContainer: {
     position: "absolute",
     top: "23px",
-    right: "30px"
+    right: "40px"
   },
   numLoggedInCount: {
     position: "relative",

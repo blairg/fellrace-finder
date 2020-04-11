@@ -26,8 +26,14 @@ import PermIdentityIcon from "@material-ui/icons/PermIdentity";
 
 import UsersOnline from "./UsersOnline";
 import Firebase from "../utils/firebase";
+import { removeLocal } from "./../service/storageService";
 
-import { menuToggleAction, menuCountLoggedInAction } from "./../actions/menu";
+import {
+  menuToggleAction,
+  menuCountLoggedInAction,
+  menuAction
+} from "./../actions/menu";
+import { loginAction } from "./../actions/user";
 
 const drawerWidth = 240;
 
@@ -85,17 +91,44 @@ const styles = theme => ({
       duration: theme.transitions.duration.enteringScreen
     }),
     marginLeft: 0
+  },
+  loginIcon: {
+    position: "absolute",
+    top: "24px",
+    right: "10px",
+    "&:hover": {
+      color: "red",
+      cursor: "pointer"
+    }
+  },
+  logoutIcon: {
+    position: "absolute",
+    top: "24px",
+    right: "10px"
+  },
+  loggedOutOption: {
+    position: "absolute",
+    bottom: "30px"
+  },
+  appVersion: {
+    position: "absolute",
+    bottom: "10px",
+    left: "48px"
   }
 });
 
-const devMode = process.env.REACT_APP_DEV_MODE === "false" ? "dev" : "prod";
+const devMode = process.env.REACT_APP_DEV_MODE === "true" ? "dev" : "prod";
+const version = `App Version: ${process.env.REACT_APP_VERSION}`;
 
 class MenuBar extends React.Component {
+  numLoggedIn = 0;
+
   componentDidMount() {
     const itemsRef = Firebase.database().ref(`${devMode}/usersLoggedIn/count`);
 
     itemsRef.on("value", snapshot => {
       const count = snapshot.val();
+      this.numLoggedIn = count;
       this.props.dispatchMenuCountLoggedInAction(count);
       itemsRef.onDisconnect().set(count > 0 ? count - 1 : 0);
     });
@@ -106,11 +139,34 @@ class MenuBar extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    this.props.dispatchMenuCountLoggedInAction(this.numLoggedIn - 1);
+  }
+
   handleDrawerOpen = () => {
     this.props.dispatchMenuToggleAction(true);
   };
 
   handleDrawerClose = () => {
+    this.props.dispatchMenuToggleAction(false);
+  };
+
+  loggedInOnClick = () => {
+    if (window.confirm("Do you want to logout?")) {
+      this.props.dispatchLoginAction(null);
+      removeLocal("userLogin");
+      this.props.dispatchMenuToggleAction(false);
+    }
+  };
+
+  loggedOutOnClick = () => {
+    this.props.dispatchMenuAction({
+      race: false,
+      runner: false,
+      calendar: false,
+      allRaces: false,
+      login: true
+    });
     this.props.dispatchMenuToggleAction(false);
   };
 
@@ -131,11 +187,17 @@ class MenuBar extends React.Component {
     const { userDetails } = userReducer;
     const loggedInIcon = !userDetails ? (
       <Suspense fallback={<CircularProgress color="secondary" />}>
-        <PanoramaFishEye />
+        <PanoramaFishEye
+          onClick={this.loggedOutOnClick}
+          className={classes.logoutIcon}
+        />
       </Suspense>
     ) : (
       <Suspense fallback={<CircularProgress color="secondary" />}>
-        <Brightness1Icon />
+        <Brightness1Icon
+          onClick={this.loggedInOnClick}
+          className={classes.loginIcon}
+        />
       </Suspense>
     );
     const numberLoggedIn =
@@ -150,6 +212,19 @@ class MenuBar extends React.Component {
           <PermIdentityIcon />
         </ListItemIcon>
         <ListItemText primary="Login" />
+      </ListItem>
+    ) : null;
+    const loggedOutMenuOption = !loggedIn ? (
+      <ListItem
+        button
+        key="Logout"
+        onClick={this.loggedInOnClick}
+        className={classes.loggedOutOption}
+      >
+        <ListItemIcon>
+          <PermIdentityIcon />
+        </ListItemIcon>
+        <ListItemText primary="Logout" />
       </ListItem>
     ) : null;
 
@@ -228,6 +303,8 @@ class MenuBar extends React.Component {
               <ListItemText primary="Calendar" />
             </ListItem>
           </List>
+          {loggedOutMenuOption}
+          <span className={classes.appVersion}>{version}</span>
         </Drawer>
       </div>
     );
@@ -241,7 +318,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   dispatchMenuToggleAction: menuOpen => dispatch(menuToggleAction(menuOpen)),
   dispatchMenuCountLoggedInAction: count =>
-    dispatch(menuCountLoggedInAction(count))
+    dispatch(menuCountLoggedInAction(count)),
+  dispatchMenuAction: menu => dispatch(menuAction(menu)),
+  dispatchLoginAction: userDetails => dispatch(loginAction(userDetails))
 });
 
 export default connect(
