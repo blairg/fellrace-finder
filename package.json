@@ -41,7 +41,7 @@
     "start": "REACT_APP_VERSION=$npm_package_version react-app-env start",
     "start:production": "react-app-env --env-file=production.env start",
     "build": "REACT_APP_VERSION=$npm_package_version react-app-env --env-file=production.env build",
-    "build:dev": "REACT_APP_VERSION=$npm_package_version react-app-env --env-file=development.env build",
+    "build:dev": "REACT_APP_VERSION=$npm_package_version react-app-env --env-file=local.env build",
     "test": "react-app-env test",
     "eject": "react-scripts eject",
     "predeploy": "yarn build",

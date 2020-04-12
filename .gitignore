@@ -110,3 +110,4 @@ yarn-error.log*
 # Project specific
 dataFiles
 package-lock.json
+local.env
