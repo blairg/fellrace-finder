@@ -104,7 +104,11 @@ const styles = theme => ({
   logoutIcon: {
     position: "absolute",
     top: "24px",
-    right: "10px"
+    right: "10px",
+    "&:hover": {
+      color: "#4CAF50",
+      cursor: "pointer"
+    }
   },
   loggedOutOption: {
     position: "absolute",
