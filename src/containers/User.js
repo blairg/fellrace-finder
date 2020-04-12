@@ -5,9 +5,14 @@ import FacebookLogin from "react-facebook-login";
 
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { setLocal } from "./../service/storageService";
+import { setLocal, getLocal } from "./../service/storageService";
 import { loginAction } from "./../actions/user";
 import { menuAction } from "./../actions/menu";
+import {
+  MENU_CHOICE,
+  PREVIOUS_MENU_CHOICE,
+  USER_LOGIN
+} from "./../utils/cacheKeys";
 
 const styles = theme => ({});
 
@@ -17,13 +22,31 @@ class User extends Component {
 
     setLocal({ key: "userLogin", value: userDetails });
     this.props.dispatchLoginAction(userDetails);
-    this.props.dispatchMenuAction({
-      race: false,
-      runner: false,
-      calendar: true,
-      allRaces: false,
-      login: false
-    });
+
+    const previousMenuOption = getLocal(PREVIOUS_MENU_CHOICE);
+
+    if (previousMenuOption) {
+      const race = previousMenuOption === "race" ? true : false;
+      const runner = previousMenuOption === "runner" ? true : false;
+      const calendar = previousMenuOption === "calendar" ? true : false;
+      const allRaces = previousMenuOption === "allraces" ? true : false;
+
+      this.props.dispatchMenuAction({
+        race: race,
+        runner: runner,
+        calendar: calendar,
+        allRaces: allRaces,
+        login: false
+      });
+    } else {
+      this.props.dispatchMenuAction({
+        race: false,
+        runner: false,
+        calendar: true,
+        allRaces: false,
+        login: false
+      });
+    }
   };
 
   render() {

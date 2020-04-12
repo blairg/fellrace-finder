@@ -13,10 +13,13 @@ import { eventsAction } from "./../actions/calendar";
 import { loginAction } from "./../actions/user";
 import { getLocal, setLocal, removeLocal } from "./../service/storageService";
 import { getEvents } from "./../service/calendarService";
+import {
+  MENU_CHOICE,
+  PREVIOUS_MENU_CHOICE,
+  USER_LOGIN
+} from "./../utils/cacheKeys";
 
 const RaceCalendar = React.lazy(() => import("./../components/RaceCalendar"));
-
-const menuCacheKey = "Main-menuoption";
 const menuCacheValues = {
   race: "race",
   runner: "runner",
@@ -24,12 +27,11 @@ const menuCacheValues = {
   allraces: "allraces",
   login: "login"
 };
-const userLoginCacheKey = "userLogin";
 
 class Main extends PureComponent {
   componentWillMount() {
-    const menuCachedValue = getLocal(menuCacheKey);
-    const loggedInCacheValue = getLocal(userLoginCacheKey);
+    const menuCachedValue = getLocal(MENU_CHOICE);
+    const loggedInCacheValue = getLocal(USER_LOGIN);
 
     if (menuCachedValue) {
       if (menuCachedValue === menuCacheValues.race) {
@@ -95,13 +97,13 @@ class Main extends PureComponent {
       );
 
       if (currentTime >= expiryTime) {
-        removeLocal(userLoginCacheKey);
+        removeLocal(USER_LOGIN);
         this.props.dispatchLoginAction(null);
       } else {
         this.props.dispatchLoginAction(loggedInCacheValue);
       }
 
-      setLocal({ key: menuCacheKey, value: menuCacheValues.login });
+      setLocal({ key: MENU_CHOICE, value: menuCacheValues.login });
     }
 
     this.calendarMenuOption();
@@ -112,6 +114,9 @@ class Main extends PureComponent {
   }
 
   calendarMenuOption = () => {
+    setLocal({ key: MENU_CHOICE, value: menuCacheValues.calendar });
+    setLocal({ key: PREVIOUS_MENU_CHOICE, value: menuCacheValues.calendar });
+
     this.props.dispatchMenuAction({
       race: false,
       runner: false,
@@ -124,7 +129,8 @@ class Main extends PureComponent {
 
   raceOnClick = async event => {
     event.preventDefault();
-    setLocal({ key: menuCacheKey, value: menuCacheValues.race });
+    setLocal({ key: MENU_CHOICE, value: menuCacheValues.race });
+    setLocal({ key: PREVIOUS_MENU_CHOICE, value: menuCacheValues.race });
 
     this.props.dispatchMenuAction({
       race: true,
@@ -138,7 +144,8 @@ class Main extends PureComponent {
 
   runnerOnClick = async event => {
     event.preventDefault();
-    setLocal({ key: menuCacheKey, value: menuCacheValues.runner });
+    setLocal({ key: MENU_CHOICE, value: menuCacheValues.runner });
+    setLocal({ key: PREVIOUS_MENU_CHOICE, value: menuCacheValues.runner });
 
     this.props.dispatchMenuAction({
       race: false,
@@ -152,7 +159,8 @@ class Main extends PureComponent {
 
   allRacesOnClick = async event => {
     event.preventDefault();
-    setLocal({ key: menuCacheKey, value: menuCacheValues.allraces });
+    setLocal({ key: MENU_CHOICE, value: menuCacheValues.allraces });
+    setLocal({ key: PREVIOUS_MENU_CHOICE, value: menuCacheValues.allraces });
 
     this.props.dispatchMenuAction({
       race: false,
@@ -171,7 +179,7 @@ class Main extends PureComponent {
 
   loginOnClick = async event => {
     event.preventDefault();
-    setLocal({ key: menuCacheKey, value: menuCacheValues.login });
+    setLocal({ key: MENU_CHOICE, value: menuCacheValues.login });
 
     this.props.dispatchMenuAction({
       race: false,

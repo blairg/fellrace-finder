@@ -163,16 +163,16 @@ class MenuBar extends React.Component {
     }
   };
 
-  loggedOutOnClick = () => {
-    this.props.dispatchMenuAction({
-      race: false,
-      runner: false,
-      calendar: false,
-      allRaces: false,
-      login: true
-    });
-    this.props.dispatchMenuToggleAction(false);
-  };
+  // loggedOutOnClick = () => {
+  //   this.props.dispatchMenuAction({
+  //     race: false,
+  //     runner: false,
+  //     calendar: false,
+  //     allRaces: false,
+  //     login: true
+  //   });
+  //   this.props.dispatchMenuToggleAction(false);
+  // };
 
   render() {
     const {
@@ -192,7 +192,7 @@ class MenuBar extends React.Component {
     const loggedInIcon = !userDetails ? (
       <Suspense fallback={<CircularProgress color="secondary" />}>
         <PanoramaFishEye
-          onClick={this.loggedOutOnClick}
+          onClick={loginOnClick}
           className={classes.logoutIcon}
         />
       </Suspense>
