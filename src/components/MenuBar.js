@@ -20,11 +20,20 @@ import EventSeatIcon from "@material-ui/icons/EventSeat";
 import DateRangeIcon from "@material-ui/icons/DateRange";
 import AssistantPhotoIcon from "@material-ui/icons/AssistantPhoto";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Brightness1Icon from "@material-ui/icons/Brightness1";
+import PanoramaFishEye from "@material-ui/icons/PanoramaFishEye";
+import PermIdentityIcon from "@material-ui/icons/PermIdentity";
 
 import UsersOnline from "./UsersOnline";
 import Firebase from "../utils/firebase";
+import { removeLocal } from "./../service/storageService";
 
-import { menuToggleAction, menuCountLoggedInAction } from "./../actions/menu";
+import {
+  menuToggleAction,
+  menuCountLoggedInAction,
+  menuAction
+} from "./../actions/menu";
+import { loginAction } from "./../actions/user";
 
 const drawerWidth = 240;
 
@@ -82,21 +91,48 @@ const styles = theme => ({
       duration: theme.transitions.duration.enteringScreen
     }),
     marginLeft: 0
+  },
+  loginIcon: {
+    position: "absolute",
+    top: "24px",
+    right: "10px",
+    "&:hover": {
+      color: "red",
+      cursor: "pointer"
+    }
+  },
+  logoutIcon: {
+    position: "absolute",
+    top: "24px",
+    right: "10px",
+    "&:hover": {
+      color: "#4CAF50",
+      cursor: "pointer"
+    }
+  },
+  loggedOutOption: {
+    position: "absolute",
+    bottom: "30px"
+  },
+  appVersion: {
+    position: "absolute",
+    bottom: "10px",
+    left: "48px"
   }
 });
 
-const devMode = process.env.REACT_APP_DEV_MODE === "false" ? "dev" : "prod";
+const devMode = process.env.REACT_APP_DEV_MODE === "true" ? "dev" : "prod";
+const version = `App Version: ${process.env.REACT_APP_VERSION}`;
 
 class MenuBar extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+  numLoggedIn = 0;
 
   componentDidMount() {
     const itemsRef = Firebase.database().ref(`${devMode}/usersLoggedIn/count`);
 
     itemsRef.on("value", snapshot => {
       const count = snapshot.val();
+      this.numLoggedIn = count;
       this.props.dispatchMenuCountLoggedInAction(count);
       itemsRef.onDisconnect().set(count > 0 ? count - 1 : 0);
     });
@@ -107,6 +143,10 @@ class MenuBar extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    this.props.dispatchMenuCountLoggedInAction(this.numLoggedIn - 1);
+  }
+
   handleDrawerOpen = () => {
     this.props.dispatchMenuToggleAction(true);
   };
@@ -114,6 +154,25 @@ class MenuBar extends React.Component {
   handleDrawerClose = () => {
     this.props.dispatchMenuToggleAction(false);
   };
+
+  loggedInOnClick = () => {
+    if (window.confirm("Do you want to logout?")) {
+      this.props.dispatchLoginAction(null);
+      removeLocal("userLogin");
+      this.props.dispatchMenuToggleAction(false);
+    }
+  };
+
+  // loggedOutOnClick = () => {
+  //   this.props.dispatchMenuAction({
+  //     race: false,
+  //     runner: false,
+  //     calendar: false,
+  //     allRaces: false,
+  //     login: true
+  //   });
+  //   this.props.dispatchMenuToggleAction(false);
+  // };
 
   render() {
     const {
@@ -123,15 +182,55 @@ class MenuBar extends React.Component {
       raceOnClick,
       allRacesOnClick,
       calendarOnClick,
-      menuReducer
+      loginOnClick,
+      menuReducer,
+      userReducer,
+      loggedIn
     } = this.props;
     const { menuOpen, count } = menuReducer;
+    const { userDetails } = userReducer;
+    const loggedInIcon = !userDetails ? (
+      <Suspense fallback={<CircularProgress color="secondary" />}>
+        <PanoramaFishEye
+          onClick={loginOnClick}
+          className={classes.logoutIcon}
+        />
+      </Suspense>
+    ) : (
+      <Suspense fallback={<CircularProgress color="secondary" />}>
+        <Brightness1Icon
+          onClick={this.loggedInOnClick}
+          className={classes.loginIcon}
+        />
+      </Suspense>
+    );
     const numberLoggedIn =
       count > 1 ? (
         <Suspense fallback={<CircularProgress color="secondary" />}>
           <UsersOnline count={count} />
         </Suspense>
       ) : null;
+    const loggedInMenuOption = loggedIn ? (
+      <ListItem button key="Login" onClick={loginOnClick}>
+        <ListItemIcon>
+          <PermIdentityIcon />
+        </ListItemIcon>
+        <ListItemText primary="Login" />
+      </ListItem>
+    ) : null;
+    const loggedOutMenuOption = !loggedIn ? (
+      <ListItem
+        button
+        key="Logout"
+        onClick={this.loggedInOnClick}
+        className={classes.loggedOutOption}
+      >
+        <ListItemIcon>
+          <PermIdentityIcon />
+        </ListItemIcon>
+        <ListItemText primary="Logout" />
+      </ListItem>
+    ) : null;
 
     return (
       <div className={classes.root}>
@@ -156,6 +255,7 @@ class MenuBar extends React.Component {
             </IconButton>
           </Toolbar>
           {numberLoggedIn}
+          {loggedInIcon}
         </AppBar>
         <Drawer
           className={classes.drawer}
@@ -177,6 +277,7 @@ class MenuBar extends React.Component {
           </div>
           <Divider />
           <List>
+            {loggedInMenuOption}
             <ListItem button key="Runner" onClick={runnerOnClick}>
               <ListItemIcon>
                 <DirectionsRunIcon />
@@ -206,6 +307,8 @@ class MenuBar extends React.Component {
               <ListItemText primary="Calendar" />
             </ListItem>
           </List>
+          {loggedOutMenuOption}
+          <span className={classes.appVersion}>{version}</span>
         </Drawer>
       </div>
     );
@@ -219,7 +322,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   dispatchMenuToggleAction: menuOpen => dispatch(menuToggleAction(menuOpen)),
   dispatchMenuCountLoggedInAction: count =>
-    dispatch(menuCountLoggedInAction(count))
+    dispatch(menuCountLoggedInAction(count)),
+  dispatchMenuAction: menu => dispatch(menuAction(menu)),
+  dispatchLoginAction: userDetails => dispatch(loginAction(userDetails))
 });
 
 export default connect(

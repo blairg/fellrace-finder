@@ -1,25 +1,31 @@
-import React, { Component, Suspense } from 'react';
-import { connect } from 'react-redux';
-import { animateScroll as scroll } from 'react-scroll';
-import { Async } from 'react-select';
-import _ from 'lodash';
-import 'react-select/dist/react-select.css';
+import React, { Component, Suspense } from "react";
+import { connect } from "react-redux";
+import { animateScroll as scroll } from "react-scroll";
+import { Async } from "react-select";
+import _ from "lodash";
+import "react-select/dist/react-select.css";
 
 // Material-UI
-import { withStyles } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { withStyles } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { loadingProgressAction, chosenRunnersAction, chosenRaceAction, endIndexAction, loadMoreProgressAction } from './../actions/search';
-import { runnerDetailsAction } from './../actions/runner';
-import { stickyAction } from './../actions/scroll';
-import LoadingProgress from './../components/LoadingProgress';
-import NoResults from './../components/NoResults';
+import {
+  loadingProgressAction,
+  chosenRunnersAction,
+  chosenRaceAction,
+  endIndexAction,
+  loadMoreProgressAction
+} from "./../actions/search";
+import { runnerDetailsAction } from "./../actions/runner";
+import { stickyAction } from "./../actions/scroll";
+import LoadingProgress from "./../components/LoadingProgress";
+import NoResults from "./../components/NoResults";
 
 import {
   search,
   partialSearch,
-  searchByRace,
-} from './../service/searchService';
+  searchByRace
+} from "./../service/searchService";
 import {
   getSession,
   setSession,
@@ -27,44 +33,50 @@ import {
   getLocal,
   setLocal,
   removeLocal,
-  removeAllSession,
-} from './../service/storageService';
-import { upperCaseWords } from './../utils/stringUtils';
+  removeAllSession
+} from "./../service/storageService";
+import { upperCaseWords } from "./../utils/stringUtils";
 
-const ArrowUpwardButton = React.lazy(() => import('./../components/ArrowUpwardButton'));
-const ArrowDownwardButton = React.lazy(() => import('./../components/ArrowDownwardButton'));
-const ClearButton = React.lazy(() => import('./../components/ClearButton'));
-const RaceDetails = React.lazy(() => import('./../components/RaceDetails'));
-const RunnerDetails = React.lazy(() => import('./../components/RunnerDetails'));
-const RaceInfo = React.lazy(() => import('./../components/RaceInfo'));
-const RaceDropDown = React.lazy(() => import('./../components/RaceDropDown'));
-const OverallStats = React.lazy(() => import('./../components/OverallStats'));
-const LoadMoreButton = React.lazy(() => import('./../components/LoadMoreButton'));
+const ArrowUpwardButton = React.lazy(() =>
+  import("./../components/ArrowUpwardButton")
+);
+const ArrowDownwardButton = React.lazy(() =>
+  import("./../components/ArrowDownwardButton")
+);
+const ClearButton = React.lazy(() => import("./../components/ClearButton"));
+const RaceDetails = React.lazy(() => import("./../components/RaceDetails"));
+const RunnerDetails = React.lazy(() => import("./../components/RunnerDetails"));
+const RaceInfo = React.lazy(() => import("./../components/RaceInfo"));
+const RaceDropDown = React.lazy(() => import("./../components/RaceDropDown"));
+const OverallStats = React.lazy(() => import("./../components/OverallStats"));
+const LoadMoreButton = React.lazy(() =>
+  import("./../components/LoadMoreButton")
+);
 
 const styles = theme => ({
   searchField: {
-    paddingBottom: '5px',
-    paddingLeft: '5px',
-    paddingRight: '5px',
-    marginTop: '-5px',
-    zIndex: '2',
+    paddingBottom: "5px",
+    paddingLeft: "5px",
+    paddingRight: "5px",
+    marginTop: "-5px",
+    zIndex: "2"
   },
   search: {
-    position: 'sticky',
-    backgroundColor: 'white',
-    zIndex: '2 !important',
-    borderBottom: '1px solid #CCCCCC',
-    top: '40px',
-    paddingTop: '40px',
-    borderTop: '1px solid #CCCCCC',
-    paddingBottom: '2px',
+    position: "sticky",
+    backgroundColor: "white",
+    zIndex: "2 !important",
+    borderBottom: "1px solid #CCCCCC",
+    top: "40px",
+    paddingTop: "40px",
+    borderTop: "1px solid #CCCCCC",
+    paddingBottom: "2px"
   },
   progress: {
-    margin: theme.spacing.unit * 2,
-  },
+    margin: theme.spacing.unit * 2
+  }
 });
 
-const chosenRunnersKey = 'chosenRunners';
+const chosenRunnersKey = "chosenRunners";
 const startIndex = 0;
 
 class Runner extends Component {
@@ -75,7 +87,7 @@ class Runner extends Component {
   }
 
   componentDidMount = () => {
-    window.addEventListener('scroll', this.onScroll, false);
+    window.addEventListener("scroll", this.onScroll, false);
 
     const namesSet = getLocal(chosenRunnersKey);
 
@@ -88,7 +100,7 @@ class Runner extends Component {
   };
 
   componentWillUnmount = () => {
-    window.removeEventListener('scroll', this.onScroll, false);
+    window.removeEventListener("scroll", this.onScroll, false);
   };
 
   shouldComponentUpdate = (nextProps, nextState) => {
@@ -96,11 +108,18 @@ class Runner extends Component {
       return true;
     }
 
-    if (!_.isEqual(this.props.dispatchChosenRace, nextProps.dispatchChosenRace)) {
+    if (
+      !_.isEqual(this.props.dispatchChosenRace, nextProps.dispatchChosenRace)
+    ) {
       return true;
     }
 
-    if (!_.isEqual(this.props.dispatchChosenRunners, nextProps.dispatchChosenRunners)) {
+    if (
+      !_.isEqual(
+        this.props.dispatchChosenRunners,
+        nextProps.dispatchChosenRunners
+      )
+    ) {
       return true;
     }
 
@@ -108,15 +127,30 @@ class Runner extends Component {
       return true;
     }
 
-    if (!_.isEqual(this.props.dispatchLoadMoreProgress, nextProps.dispatchLoadMoreProgress)) {
+    if (
+      !_.isEqual(
+        this.props.dispatchLoadMoreProgress,
+        nextProps.dispatchLoadMoreProgress
+      )
+    ) {
       return true;
     }
 
-    if (!_.isEqual(this.props.dispatchLoadingProgress, nextProps.dispatchLoadingProgress)) {
+    if (
+      !_.isEqual(
+        this.props.dispatchLoadingProgress,
+        nextProps.dispatchLoadingProgress
+      )
+    ) {
       return true;
     }
 
-    if (!_.isEqual(this.props.dispatchRunnerDetails, nextProps.dispatchRunnerDetails)) {
+    if (
+      !_.isEqual(
+        this.props.dispatchRunnerDetails,
+        nextProps.dispatchRunnerDetails
+      )
+    ) {
       return true;
     }
 
@@ -145,12 +179,16 @@ class Runner extends Component {
     }
 
     return false;
-  }
+  };
 
   buildClearButton = () => {
-    return <Suspense fallback={<CircularProgress className={styles.prototypeprogress} />}>
-            <ClearButton onClick={this.clearClick} />
-          </Suspense>;
+    return (
+      <Suspense
+        fallback={<CircularProgress className={styles.prototypeprogress} />}
+      >
+        <ClearButton onClick={this.clearClick} />
+      </Suspense>
+    );
   };
 
   onScroll = () => {
@@ -169,10 +207,10 @@ class Runner extends Component {
     if (runnerName) {
       this.props.dispatchLoadingProgress(true);
       this.props.dispatchRunnerDetails(null);
-      this.props.dispatchChosenRace('');
+      this.props.dispatchChosenRace("");
 
       const { endIndex } = this.props.searchReducer;
-      const cacheKey = `getRunner${runnerName}`.replace(' ', '');
+      const cacheKey = `getRunner${runnerName}`.replace(" ", "");
       const runnerInStorage = getSession(cacheKey);
       let result;
 
@@ -199,8 +237,8 @@ class Runner extends Component {
       });
 
       const cacheKey = `getRunners${names.join(
-        '',
-      )}${startIndex}${newEndIndex}`.replace(' ', '');
+        ""
+      )}${startIndex}${newEndIndex}`.replace(" ", "");
       const runnersInStorage = getSession(cacheKey);
       let runnersDetails;
 
@@ -228,9 +266,9 @@ class Runner extends Component {
         names.push(eachRunner.display);
       });
 
-      const cacheKey = `getRunnersByRace${names.join('')}${race}`.replace(
-        ' ',
-        '',
+      const cacheKey = `getRunnersByRace${names.join("")}${race}`.replace(
+        " ",
+        ""
       );
       const runnersInStorage = getSession(cacheKey);
       let runnersDetails;
@@ -255,7 +293,7 @@ class Runner extends Component {
     event.preventDefault();
     const searchValue = this.searchRunnerRef.value.trim();
 
-    if (searchValue !== '') {
+    if (searchValue !== "") {
       if (upperCaseWords(searchValue) !== this.state.runnerName) {
         await this.performSearch(searchValue);
       }
@@ -269,7 +307,7 @@ class Runner extends Component {
     this.props.dispatchRunnerDetails(null);
     this.props.dispatchSticky(false);
     this.props.dispatchChosenRunners([]);
-    this.props.dispatchChosenRace('');
+    this.props.dispatchChosenRace("");
     this.props.dispatchEndIndex(0);
 
     removeLocal(chosenRunnersKey);
@@ -308,9 +346,11 @@ class Runner extends Component {
     let raceInfo;
 
     if (raceResult.raceInfo) {
-      raceInfo = <Suspense fallback={<CircularProgress className={styles.progress} />}>
-                  <RaceInfo raceInfo={raceResult.raceInfo} />
-                </Suspense>;
+      raceInfo = (
+        <Suspense fallback={<CircularProgress className={styles.progress} />}>
+          <RaceInfo raceInfo={raceResult.raceInfo} />
+        </Suspense>
+      );
     }
 
     return (
@@ -367,7 +407,7 @@ class Runner extends Component {
       const newEndIndex = this.calculateNextEndIndex(runnerNames);
       const runnersDetailsResult = await this.searchForRunners(
         runnerNames,
-        newEndIndex,
+        newEndIndex
       );
 
       if (!_.isEqual(chosenRunners, runnerNames)) {
@@ -382,8 +422,8 @@ class Runner extends Component {
         this.props.dispatchEndIndex(newEndIndex);
       }
 
-      if (chosenRace !== '') {
-        this.props.dispatchChosenRace('');
+      if (chosenRace !== "") {
+        this.props.dispatchChosenRace("");
       }
 
       setLocal({ key: chosenRunnersKey, value: runnerNames });
@@ -401,7 +441,7 @@ class Runner extends Component {
     if (runnerNames.length > 0) {
       const runnersDetailsResult = await this.searchForRunnersByRace(
         runnerNames,
-        chosenRaceParam,
+        chosenRaceParam
       );
 
       if (chosenRaceParam !== chosenRace) {
@@ -425,7 +465,6 @@ class Runner extends Component {
   };
 
   fetchRunners = async (searchValue, callback) => {
-    console.log('searching - ', searchValue);
     this.props.dispatchLoadingProgress(true);
 
     if (!searchValue) {
@@ -461,7 +500,7 @@ class Runner extends Component {
       this.props.dispatchEndIndex(0);
     }
 
-    if (chosenRace === 'all') {
+    if (chosenRace === "all") {
       await this.onChange(chosenRunners);
     } else {
       await this.fetchRunnerByRace(chosenRunners, chosenRace);
@@ -474,9 +513,11 @@ class Runner extends Component {
     const { runnerDetails } = this.props.runnerReducer;
 
     if (runnerDetails.overallStats) {
-      return  <Suspense fallback={<CircularProgress className={styles.progress} />}>
-                <OverallStats overallStats={runnerDetails.overallStats} />
-              </Suspense>;
+      return (
+        <Suspense fallback={<CircularProgress className={styles.progress} />}>
+          <OverallStats overallStats={runnerDetails.overallStats} />
+        </Suspense>
+      );
     }
 
     return null;
@@ -485,10 +526,10 @@ class Runner extends Component {
   buildChosenRaceList = (chosenRace, races) => {
     let filteredRaces = [];
     if (!chosenRace) {
-      chosenRace = '';
+      chosenRace = "";
     }
 
-    const listOfChosenRaces = chosenRace.split('||');
+    const listOfChosenRaces = chosenRace.split("||");
 
     if (listOfChosenRaces.length > 1) {
       listOfChosenRaces.map(eachChosenRace => {
@@ -516,10 +557,15 @@ class Runner extends Component {
   render() {
     // @TODO: Tidy this up getting very cluttered
     const { progress, searchField, search } = this.props.classes;
-    const { loadingProgress, chosenRunners, chosenRace, loadMoreLoading } = this.props.searchReducer;
+    const {
+      loadingProgress,
+      chosenRunners,
+      chosenRace,
+      loadMoreLoading
+    } = this.props.searchReducer;
     const { runnerDetails } = this.props.runnerReducer;
     const { sticky } = this.props.scrollReducer;
-    const searchClass = sticky ? search : '';
+    const searchClass = sticky ? search : "";
     let { endIndex } = this.props.searchReducer;
     let clearButton;
     let overallStats;
@@ -536,46 +582,54 @@ class Runner extends Component {
       loadingResults = this.loadingProgress();
     }
 
-    if (runnerDetails != null && runnerDetails.races && runnerDetails.races.length > 0) {
+    if (
+      runnerDetails != null &&
+      runnerDetails.races &&
+      runnerDetails.races.length > 0
+    ) {
       // Display clear button
       clearButton = this.buildClearButton();
       overallStats = this.populateOverallStats();
       const racesForRunner = runnerDetails.races;
 
-      if (endIndex === 0) { 
+      if (endIndex === 0) {
         endIndex = 10;
       }
 
       // @TODO : Pass off to a function
       // Filtering races
-      if (chosenRace === '') {
+      if (chosenRace === "") {
         raceResults = racesForRunner.map(race => this.buildRaceResult(race));
 
         // Load more button
         if (runnerDetails.overallStats.noOfRaces > endIndex) {
-          loadMoreButton = <Suspense fallback={<CircularProgress className={progress} />}>
-                            <LoadMoreButton onClick={this.loadMoreOnClick} />
-                          </Suspense>;
+          loadMoreButton = (
+            <Suspense fallback={<CircularProgress className={progress} />}>
+              <LoadMoreButton onClick={this.loadMoreOnClick} />
+            </Suspense>
+          );
         }
       } else {
         raceResults = this.buildChosenRaceList(chosenRace, runnerDetails.races);
 
         // Load more button
         if (raceResults.length > endIndex) {
-          loadMoreButton = <Suspense fallback={<CircularProgress className={progress} />}>
-                             <LoadMoreButton onClick={this.loadMoreOnClick} />
-                           </Suspense>;
+          loadMoreButton = (
+            <Suspense fallback={<CircularProgress className={progress} />}>
+              <LoadMoreButton onClick={this.loadMoreOnClick} />
+            </Suspense>
+          );
         }
       }
 
       // Populating races drop down
       racesSelect = (
         <Suspense fallback={<CircularProgress className={progress} />}>
-                             <RaceDropDown
-                                raceNames={runnerDetails.raceNames}
-                                chosenRace={chosenRace}
-                                onChange={this.handleChooseRaceChange}
-                              />
+          <RaceDropDown
+            raceNames={runnerDetails.raceNames}
+            chosenRace={chosenRace}
+            onChange={this.handleChooseRaceChange}
+          />
         </Suspense>
       );
 
@@ -587,15 +641,15 @@ class Runner extends Component {
       } else {
         downwardArrowButtonShow = (
           <Suspense fallback={<CircularProgress className={progress} />}>
-                  <ArrowDownwardButton onClick={this.scrollToBottomClick} />
-                </Suspense>
+            <ArrowDownwardButton onClick={this.scrollToBottomClick} />
+          </Suspense>
         );
 
         if (sticky) {
           scrollToTopButton = (
             <Suspense fallback={<CircularProgress className={progress} />}>
-                  <ArrowUpwardButton onClick={this.scrollToTopClick} />
-                </Suspense>
+              <ArrowUpwardButton onClick={this.scrollToTopClick} />
+            </Suspense>
           );
         }
       }
@@ -639,16 +693,23 @@ class Runner extends Component {
 
 const mapStateToProps = state => ({
   ...state
- });
+});
 
- const mapDispatchToProps = dispatch => ({
-  dispatchLoadingProgress: (loadingProgress) => dispatch(loadingProgressAction(loadingProgress)),
-  dispatchRunnerDetails: (runnerDetails) => dispatch(runnerDetailsAction(runnerDetails)),
-  dispatchSticky: (sticky) => dispatch(stickyAction(sticky)),
-  dispatchChosenRunners: (chosenRunners) => dispatch(chosenRunnersAction(chosenRunners)),
-  dispatchChosenRace: (chosenRace) => dispatch(chosenRaceAction(chosenRace)),
-  dispatchEndIndex: (endIndex) => dispatch(endIndexAction(endIndex)),
-  dispatchLoadMoreProgress: (loadMoreProgress) => dispatch(loadMoreProgressAction(loadMoreProgress)),
- });
+const mapDispatchToProps = dispatch => ({
+  dispatchLoadingProgress: loadingProgress =>
+    dispatch(loadingProgressAction(loadingProgress)),
+  dispatchRunnerDetails: runnerDetails =>
+    dispatch(runnerDetailsAction(runnerDetails)),
+  dispatchSticky: sticky => dispatch(stickyAction(sticky)),
+  dispatchChosenRunners: chosenRunners =>
+    dispatch(chosenRunnersAction(chosenRunners)),
+  dispatchChosenRace: chosenRace => dispatch(chosenRaceAction(chosenRace)),
+  dispatchEndIndex: endIndex => dispatch(endIndexAction(endIndex)),
+  dispatchLoadMoreProgress: loadMoreProgress =>
+    dispatch(loadMoreProgressAction(loadMoreProgress))
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(React.memo(Runner)));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(React.memo(Runner)));
