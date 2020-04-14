@@ -32,6 +32,8 @@ export async function getEvents() {
           short: response.data[i].short,
           medium: response.data[i].medium,
           long: response.data[i].long,
+          cancelled: response.data[i].cancelled,
+          postponed: response.data[i].postponed,
           url: response.data[i].url
         });
       }
