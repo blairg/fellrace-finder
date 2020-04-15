@@ -27,13 +27,13 @@ import PermIdentityIcon from "@material-ui/icons/PermIdentity";
 import UsersOnline from "./UsersOnline";
 import Firebase from "../utils/firebase";
 import { removeLocal } from "./../service/storageService";
-
 import {
   menuToggleAction,
   menuCountLoggedInAction,
   menuAction
 } from "./../actions/menu";
 import { loginAction } from "./../actions/user";
+import { USER_LOGIN } from "./../utils/cacheKeys";
 
 const drawerWidth = 240;
 
@@ -158,21 +158,10 @@ class MenuBar extends React.Component {
   loggedInOnClick = () => {
     if (window.confirm("Do you want to logout?")) {
       this.props.dispatchLoginAction(null);
-      removeLocal("userLogin");
+      removeLocal(USER_LOGIN);
       this.props.dispatchMenuToggleAction(false);
     }
   };
-
-  // loggedOutOnClick = () => {
-  //   this.props.dispatchMenuAction({
-  //     race: false,
-  //     runner: false,
-  //     calendar: false,
-  //     allRaces: false,
-  //     login: true
-  //   });
-  //   this.props.dispatchMenuToggleAction(false);
-  // };
 
   render() {
     const {

@@ -10,8 +10,6 @@ import Avatar from "@material-ui/core/Avatar";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
-//import { getSession, setSession, removeSession } from './../service/storageService';
-
 const localizer = BigCalendar.momentLocalizer(moment);
 
 const styles = theme => ({
@@ -53,31 +51,6 @@ const styles = theme => ({
 const allViews = Object.keys(BigCalendar.Views).map(k => BigCalendar.Views[k]);
 
 const propGetter = (event, start, end, isSelected) => {
-  // @TODO: Attempt at trying to make the name open the race in a new tab.
-  // const cacheKey = 'RaceCalendar.propGetter';
-
-  // if (isSelected) {
-  //   console.log(event.url, isSelected);
-  //   const cachedValue = getSession(cacheKey);
-
-  //   if (cachedValue && cachedValue === event.url) {
-  //     removeSession(cacheKey);
-  //   }
-
-  //   if (cachedValue && cachedValue !== event.url) {
-  //     removeSession(cacheKey);
-  //     window.open(event.url, '', null, false);
-  //   }
-
-  //   if (!cachedValue) {
-  //     setSession({key: cacheKey, value: event.url});
-  //     window.open(event.url, '', null, false);
-  //   }
-  //   //console.log(event);
-  // } else {
-  //   removeSession(cacheKey);
-  // }
-
   let newStyle = {
     backgroundColor: "#918f8f",
     color: "black",
@@ -117,6 +90,10 @@ const propGetter = (event, start, end, isSelected) => {
     className: "",
     style: newStyle
   };
+};
+
+const onSelectEvent = event => {
+  window.open(event.url, "_blank");
 };
 
 function RaceCalendar(props) {
@@ -165,6 +142,8 @@ function RaceCalendar(props) {
         scrollToTime={new Date(1970, 1, 1, 6)}
         localizer={localizer}
         eventPropGetter={propGetter}
+        selectable={true}
+        onSelectEvent={onSelectEvent}
       />
       <br />
       <br />
