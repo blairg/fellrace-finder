@@ -20,7 +20,7 @@ class User extends Component {
   facebookLoginResponse = details => {
     const userDetails = { provider: "facebook", details: details };
 
-    setLocal({ key: "userLogin", value: userDetails });
+    setLocal({ key: USER_LOGIN, value: userDetails });
     this.props.dispatchLoginAction(userDetails);
 
     const previousMenuOption = getLocal(PREVIOUS_MENU_CHOICE);
@@ -46,6 +46,14 @@ class User extends Component {
         allRaces: false,
         login: false
       });
+    }
+  };
+
+  componentWillMount = () => {
+    const userDetails = getLocal(USER_LOGIN);
+
+    if (userDetails) {
+      this.props.dispatchLoginAction(userDetails);
     }
   };
 
