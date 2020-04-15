@@ -51,7 +51,6 @@ class User extends Component {
 
   componentWillMount = () => {
     const userDetails = getLocal(USER_LOGIN);
-    //console.log('user did mount', getLocal(USER_LOGIN));
 
     if (userDetails) {
       this.props.dispatchLoginAction(userDetails);
