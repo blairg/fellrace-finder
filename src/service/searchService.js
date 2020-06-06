@@ -219,3 +219,33 @@ export async function getAllRaces() {
 
   return races;
 }
+
+export async function getAllRacesWithGeoLocation() {
+  const url = `${process.env.REACT_APP_API_SERVER}/allraceswithgeoloaction`;
+  let races = null;
+
+  const cacheKey = `raceSearchAllRacesWithGeoLocation`;
+  const racesInSessionStorage = getSession(cacheKey);
+
+  if (racesInSessionStorage) {
+    return racesInSessionStorage;
+  }
+
+  await axios
+    .get(url)
+    .then(function(response) {
+      races = response.data;
+
+      return races;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+
+  setSession({
+    key: cacheKey,
+    value: races
+  });
+
+  return races;
+}

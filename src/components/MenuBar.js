@@ -23,6 +23,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Brightness1Icon from "@material-ui/icons/Brightness1";
 import PanoramaFishEye from "@material-ui/icons/PanoramaFishEye";
 import PermIdentityIcon from "@material-ui/icons/PermIdentity";
+import MapIcon from "@material-ui/icons/Map";
 
 import UsersOnline from "./UsersOnline";
 import Firebase from "../utils/firebase";
@@ -172,6 +173,7 @@ class MenuBar extends React.Component {
       allRacesOnClick,
       calendarOnClick,
       loginOnClick,
+      mapsOnClick,
       menuReducer,
       userReducer,
       loggedIn
@@ -285,10 +287,12 @@ class MenuBar extends React.Component {
               </ListItemIcon>
               <ListItemText primary="All Races" />
             </ListItem>
-            {/* <ListItem button key='Club'>
-                <ListItemIcon><MapIcon /></ListItemIcon>
-                <ListItemText primary='Club' />
-        </ListItem> */}
+            <ListItem button key="Maps" onClick={mapsOnClick}>
+              <ListItemIcon>
+                <MapIcon />
+              </ListItemIcon>
+              <ListItemText primary="Maps" />
+            </ListItem>
             <ListItem button key="Calendar" onClick={calendarOnClick}>
               <ListItemIcon>
                 <DateRangeIcon />

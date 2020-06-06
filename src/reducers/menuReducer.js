@@ -11,6 +11,7 @@ export default (
     allRaces: false,
     calendar: true,
     login: false,
+    maps: false,
     menuOpen: false,
     count: 0
   },
@@ -23,7 +24,8 @@ export default (
         race: action.payload.race,
         allRaces: action.payload.allRaces,
         login: action.payload.login,
-        calendar: action.payload.calendar
+        calendar: action.payload.calendar,
+        maps: action.payload.maps
       });
     case MENU_TOGGLE_ACTION:
       return Object.assign({}, state, {

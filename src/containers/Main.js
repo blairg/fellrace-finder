@@ -7,11 +7,13 @@ import Runner from "./Runner";
 import Race from "./Race";
 import RaceList from "./RaceList";
 import User from "./User";
+import Maps from "./Maps";
 
 import { menuAction, menuToggleAction } from "./../actions/menu";
 import { eventsAction } from "./../actions/calendar";
 import { loginAction } from "./../actions/user";
 import { getLocal, setLocal, removeLocal } from "./../service/storageService";
+import { getAllRacesWithGeoLocation } from "./../service/searchService";
 import { getEvents } from "./../service/calendarService";
 import {
   MENU_CHOICE,
@@ -25,7 +27,8 @@ const menuCacheValues = {
   runner: "runner",
   calendar: "calendar",
   allraces: "allraces",
-  login: "login"
+  login: "login",
+  maps: "maps"
 };
 
 class Main extends PureComponent {
@@ -40,7 +43,8 @@ class Main extends PureComponent {
           runner: false,
           calendar: false,
           allRaces: false,
-          login: false
+          login: false,
+          maps: false
         });
       }
 
@@ -50,7 +54,8 @@ class Main extends PureComponent {
           runner: true,
           calendar: false,
           allRaces: false,
-          login: false
+          login: false,
+          maps: false
         });
       }
 
@@ -60,7 +65,8 @@ class Main extends PureComponent {
           runner: false,
           calendar: true,
           allRaces: false,
-          login: false
+          login: false,
+          maps: false
         });
       }
 
@@ -70,7 +76,8 @@ class Main extends PureComponent {
           runner: false,
           calendar: false,
           allRaces: true,
-          login: false
+          login: false,
+          maps: false
         });
       }
 
@@ -80,7 +87,19 @@ class Main extends PureComponent {
           runner: false,
           calendar: false,
           allRaces: false,
-          login: true
+          login: true,
+          maps: false
+        });
+      }
+
+      if (menuCachedValue === menuCacheValues.maps) {
+        this.props.dispatchMenuAction({
+          race: false,
+          runner: false,
+          calendar: false,
+          allRaces: false,
+          login: false,
+          maps: true
         });
       }
 
@@ -110,7 +129,13 @@ class Main extends PureComponent {
   }
 
   async componentDidMount() {
-    this.props.dispatchCalendarEventsAction(await getEvents());
+    if (this.props.menuReducer.calendar) {
+      this.props.dispatchCalendarEventsAction(await getEvents());
+    }
+
+    if (this.props.menuReducer.maps) {
+      this.props.dispatchMapsRacesAction(await getAllRacesWithGeoLocation());
+    }
   }
 
   calendarMenuOption = () => {
@@ -122,7 +147,8 @@ class Main extends PureComponent {
       runner: false,
       calendar: true,
       allRaces: false,
-      login: false
+      login: false,
+      maps: false
     });
     this.props.dispatchMenuToggleAction(false);
   };
@@ -137,7 +163,8 @@ class Main extends PureComponent {
       runner: false,
       calendar: false,
       allRaces: false,
-      login: false
+      login: false,
+      maps: false
     });
     this.props.dispatchMenuToggleAction(false);
   };
@@ -152,7 +179,8 @@ class Main extends PureComponent {
       runner: true,
       calendar: false,
       allRaces: false,
-      login: false
+      login: false,
+      maps: false
     });
     this.props.dispatchMenuToggleAction(false);
   };
@@ -167,7 +195,8 @@ class Main extends PureComponent {
       runner: false,
       calendar: false,
       allRaces: true,
-      login: false
+      login: false,
+      maps: false
     });
     this.props.dispatchMenuToggleAction(false);
   };
@@ -186,28 +215,51 @@ class Main extends PureComponent {
       runner: false,
       calendar: false,
       allRaces: false,
-      login: true
+      login: true,
+      maps: false
+    });
+    this.props.dispatchMenuToggleAction(false);
+  };
+
+  mapsOnClick = async event => {
+    event.preventDefault();
+    setLocal({ key: MENU_CHOICE, value: menuCacheValues.maps });
+
+    this.props.dispatchMenuAction({
+      race: false,
+      runner: false,
+      calendar: false,
+      allRaces: false,
+      login: false,
+      maps: true
     });
     this.props.dispatchMenuToggleAction(false);
   };
 
   render() {
-    const { race, runner, calendar, allRaces, login } = this.props.menuReducer;
+    const {
+      race,
+      runner,
+      calendar,
+      allRaces,
+      login,
+      maps
+    } = this.props.menuReducer;
     const { events } = this.props.calendarReducer;
     const { userDetails } = this.props.userReducer;
     const userLoggedIn = !userDetails ? true : false;
     let menuOption;
     let hasUserSelectedMenuOption = false;
 
-    if (!race && !calendar && runner && !allRaces && !login) {
+    if (!race && !calendar && runner && !allRaces && !login && !maps) {
       menuOption = <Runner />;
     }
 
-    if (race && !calendar && !runner && !allRaces && !login) {
+    if (race && !calendar && !runner && !allRaces && !login && !maps) {
       menuOption = <Race />;
     }
 
-    if (!race && !calendar && !runner && allRaces && !login) {
+    if (!race && !calendar && !runner && allRaces && !login && !maps) {
       menuOption = (
         <Suspense fallback={<CircularProgress />}>
           <RaceList />
@@ -215,7 +267,15 @@ class Main extends PureComponent {
       );
     }
 
-    if (events && !race && calendar && !runner && !allRaces && !login) {
+    if (
+      events &&
+      !race &&
+      calendar &&
+      !runner &&
+      !allRaces &&
+      !login &&
+      !maps
+    ) {
       menuOption = (
         <Suspense fallback={<CircularProgress />}>
           <RaceCalendar events={events} />
@@ -223,7 +283,7 @@ class Main extends PureComponent {
       );
     }
 
-    if (!race && !calendar && !runner && !allRaces && login) {
+    if (!race && !calendar && !runner && !allRaces && login && !maps) {
       menuOption = (
         <Suspense fallback={<CircularProgress />}>
           <User />
@@ -231,7 +291,15 @@ class Main extends PureComponent {
       );
     }
 
-    if (race || runner || calendar || allRaces || login) {
+    if (!race && !calendar && !runner && !allRaces && !login && maps) {
+      menuOption = (
+        <Suspense fallback={<CircularProgress />}>
+          <Maps />
+        </Suspense>
+      );
+    }
+
+    if (race || runner || calendar || allRaces || login || maps) {
       hasUserSelectedMenuOption = true;
     }
 
@@ -243,6 +311,7 @@ class Main extends PureComponent {
           allRacesOnClick={this.allRacesOnClick}
           calendarOnClick={this.calendarOnClick}
           loginOnClick={this.loginOnClick}
+          mapsOnClick={this.mapsOnClick}
           closeMenu={hasUserSelectedMenuOption}
           loggedIn={userLoggedIn}
         />

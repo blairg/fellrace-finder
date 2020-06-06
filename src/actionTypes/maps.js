@@ -1,0 +1,1 @@
+export const MAPS_RACES_ACTION = "MAPS_RACES_ACTION";
