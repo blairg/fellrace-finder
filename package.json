@@ -35,7 +35,8 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "typeface-roboto": "^0.0.54"
+    "typeface-roboto": "^0.0.54",
+    "@snyk/protect": "latest"
   },
   "scripts": {
     "start": "REACT_APP_VERSION=$npm_package_version react-app-env --env-file=local.env start",
@@ -46,7 +47,9 @@
     "eject": "react-scripts eject",
     "predeploy": "yarn build",
     "deploy": "gh-pages -d build",
-    "prettier": "prettier --single-quote --trailing-comma all --write \"src/*.js\" \"src/**/*.js*\""
+    "prettier": "prettier --single-quote --trailing-comma all --write \"src/*.js\" \"src/**/*.js*\"",
+    "prepare": "yarn run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -120,5 +123,6 @@
       "/Users/bga11/go/src/github.com/blairg/fellrace-finder/node_modules/jest-watch-typeahead/filename.js",
       "/Users/bga11/go/src/github.com/blairg/fellrace-finder/node_modules/jest-watch-typeahead/testname.js"
     ]
-  }
+  },
+  "snyk": true
 }
